@@ -11,7 +11,7 @@ $page->navbar = $presets->GenerateNavbar();
 $page->navbar[1][1]['class'] = 'active'; // we highlith the contact link
 
 
-if($_POST) {
+if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token'])) {
 
 	  $email = $_POST['email'];
 	  $message = $_POST['message'];
@@ -29,13 +29,17 @@ if($_POST) {
                 $page->success = "Your message was sent !";
 
 	  }
-}
+} else if($_POST)
+    $page->error = "Invalid request !";
 
 
 include 'header.php';
 
-echo "
-<div class=\"container\"><div class='span6'>";
+$_SESSION['token'] = sha1(rand()); // random token
+
+echo "<div class='container'>
+    <div class='span3 hidden-phone'></div>
+	<div class='span6'>	";
 
 
 if(isset($page->error))
@@ -64,6 +68,8 @@ else if(isset($page->success))
 		                <textarea name='message' rows='5' class='input-large'></textarea>
 		              </div>
 		            </div>
+
+           			<input type='hidden' name='token' value='".$_SESSION['token']."'>
 
 		            <div class='control-group'>
 		              <div class='controls'>

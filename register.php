@@ -10,7 +10,8 @@ if($user->islg()) { // if it's alreadt logged in redirect to the main page
 $page->title = "Register to ". $set->site_name;
 
 
-if($_POST) {
+if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token'])) {
+
   // we validate the data
 
   $name = $_POST['name'];
@@ -49,54 +50,67 @@ if($_POST) {
   }
 
 
-}
+} else if($_POST)
+    $page->error = "Invalid request !";
 
 
 include 'header.php';
 
+$_SESSION['token'] = sha1(rand()); // random token
 
+$extra_content = ''; // holds success or error message
 
 if(isset($page->error))
-  echo "<div class=\"alert alert-error\">".$page->error."</div>";
+  $extra_content = "<div class=\"alert alert-error\">".$page->error."</div>";
 
 if(isset($page->success)) {
 
-  echo "<div class=\"alert alert-success\"><p><strong>Your account was successfully registered !</strong></p></div>
+  $extra_content = "<div class=\"alert alert-success\"><p><strong>Your account was successfully registered !</strong></p></div>
   <div class='content'> <a class='btn btn-primary' href='$set->url'>Start exploring</a>
   ";
 
 
 } else {
-  echo "<div class='container'>
-  <form action='#' id='contact-form' class='form-horizontal' method='post'>
-    <fieldset>
-      <legend>Register Form </legend>
 
-      <div class='control-group'>
-        <label class='control-label' for='name'>Username</label>
-        <div class='controls'>
-          <input type='text' class='input-xlarge' name='name' id='name'>
-        </div>
-      </div>
-      <div class='control-group'>
-        <label class='control-label' for='email'>Email Address</label>
-        <div class='controls'>
-          <input type='text' class='input-xlarge' name='email' id='email'>
-        </div>
-      </div>
-      <div class='control-group'>
-        <label class='control-label' for='password'>Password</label>
-        <div class='controls'>
-          <input type='password' class='input-xlarge' name='password' id='password'>
-        </div>
-      </div>
 
-  <div class='form-actions'>
-  <button type='submit' class='btn btn-primary btn-large'>Register</button>
-    <button type='reset' class='btn'>Cancel</button>
-  </div>
-    </fieldset>
-  </form>
+
+  echo "
+  <div class='container'>
+    <div class='span3 hidden-phone'></div>
+      <div class='span6'>
+
+      ".$extra_content."
+
+      <form action='#' id='contact-form' class='form-horizontal well' method='post'>
+        <fieldset>
+          <legend>Register Form </legend>
+
+          <div class='control-group'>
+            <label class='control-label' for='name'>Username</label>
+            <div class='controls'>
+              <input type='text' class='input-xlarge' name='name' id='name'>
+            </div>
+          </div>
+          <div class='control-group'>
+            <label class='control-label' for='email'>Email Address</label>
+            <div class='controls'>
+              <input type='text' class='input-xlarge' name='email' id='email'>
+            </div>
+          </div>
+          <div class='control-group'>
+            <label class='control-label' for='password'>Password</label>
+            <div class='controls'>
+              <input type='password' class='input-xlarge' name='password' id='password'>
+            </div>
+          </div>
+          <input type='hidden' name='token' value='".$_SESSION['token']."'>
+          <div class='form-actions'>
+          <button type='submit' class='btn btn-primary btn-large'>Register</button>
+            <button type='reset' class='btn'>Cancel</button>
+          </div>
+        </fieldset>
+      </form>
+    </div>
 
 
   </div>";

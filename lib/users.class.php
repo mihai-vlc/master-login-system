@@ -52,7 +52,7 @@ class User {
 
 		}else {
 			// we set some default values
-			// by doing this we won't have to do an extra check to display user or guest on the site
+			// by doing this we won't have to do an extra check to display user or `guest` on the site
 			$this->filter = new stdClass();
 			$this->filter->username = "Guest";
 		}

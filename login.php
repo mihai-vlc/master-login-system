@@ -10,7 +10,7 @@ if($user->islg()) { // if it's alreadt logged in redirect to the main page
 $page->title = "Login to ". $set->site_name;
 
 
-if($_POST) {
+if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token'])) {
     // we validate the data
     if(isset($_GET['forget'])) {
     
@@ -19,7 +19,7 @@ if($_POST) {
         if(!preg_match('/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/', $email)) 
             $page->error = "Email address is not valid.";   
         
-        if(!($usr = $db->get_row("SELECT `userid` FROM `$set->users_table` WHERE `email` = '".$db->escape($email)."'")))
+        if(!isset($page->error) && !($usr = $db->get_row("SELECT `userid` FROM `$set->users_table` WHERE `email` = '".$db->escape($email)."'")))
             $page->error = "This email address doesn't exist in our database !";
 
 
@@ -69,13 +69,19 @@ if($_POST) {
             exit;
         }
     }
-}
+} else if($_POST)
+    $page->error = "Invalid request !";
 
 
 include 'header.php';
 
 
-  echo "<div class='container'>";
+$_SESSION['token'] = sha1(rand()); // random token
+
+  echo "<div class='container'>
+  <div class='row'>
+    <div class='span3 hidden-phone'></div>
+      <div class='span6' id='form-login'>";
 
 
 if(isset($page->error))
@@ -83,10 +89,7 @@ if(isset($page->error))
 else if(isset($page->success))
   echo "<div class=\"alert alert-success\">".$page->success."</div>";
 
-echo "<div class='row'>
-      <div class='span3 hidden-phone'></div>
-      <div class='span6' id='form-login'>
-        ";
+
 if(isset($_GET['forget'])) {
     
     echo "<form class='form-horizontal well' action='#' method='post'>
@@ -100,6 +103,8 @@ if(isset($_GET['forget'])) {
                 <input type='text' placeholder='john.doe@domain.com' name='email' class='input-large'>
               </div>
             </div>
+            
+            <input type='hidden' name='token' value='".$_SESSION['token']."'>
 
             <div class='control-group'>
               <div class='controls'>
@@ -125,6 +130,8 @@ if(isset($_GET['forget'])) {
                 <input type='password' name='password' class='input-large'>
               </div>
             </div>
+
+            <input type='hidden' name='token' value='".$_SESSION['token']."'>
 
             <div class='control-group'>
               <div class='controls'>
@@ -172,6 +179,9 @@ if(isset($_GET['forget'])) {
                 <input type='checkbox' name='r' value='1' id='r'>
               </div>
             </div>
+
+            <input type='hidden' name='token' value='".$_SESSION['token']."'>
+
             <div class='control-group'>
               <div class='controls'>
 
