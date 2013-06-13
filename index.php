@@ -5,9 +5,7 @@ include "inc/init.php";
 
 $page->title = "Welcome to ". $set->site_name;
 
-$page->navbar = $presets->GenerateNavbar();
-
-$page->navbar[0][1]['class'] = 'active'; // we highlith the home link
+$presets->setActive("home"); // we highlith the home link
 
 
 include 'header.php';

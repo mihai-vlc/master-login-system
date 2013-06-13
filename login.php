@@ -16,25 +16,24 @@ if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token']
     
         $email = $_POST['email'];
         
-        if(!preg_match('/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/', $email)) 
+        if(!$options->isValidMail($email)) 
             $page->error = "Email address is not valid.";   
         
-        if(!isset($page->error) && !($usr = $db->get_row("SELECT `userid` FROM `$set->users_table` WHERE `email` = '".$db->escape($email)."'")))
+        if(!isset($page->error) && !($usr = $db->get_row("SELECT `userid` FROM `".MUS_PREFIX."users` WHERE `email` = '".$db->escape($email)."'")))
             $page->error = "This email address doesn't exist in our database !";
 
 
         if(!isset($page->error)) {
             $key = sha1(rand());
            
-            $db->query("UPDATE `$set->users_table` SET `key` = '$key' WHERE `userid` = '$usr->userid'");
+            $db->query("UPDATE `".MUS_PREFIX."users` SET `key` = '$key' WHERE `userid` = '$usr->userid'");
            
-            $link = $set->url."/login.php?key=".$key;
-            $from = 'MIME-Version: 1.0' . "\r\n";
-            $from .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-            $from .="From: not.reply@".$set->url;
+            $link = $set->url."/login.php?key=".$key."&userid=".$usr->userid;
+
+            $from ="From: not.reply@".$set->url;
             $sub = "New Password !";
             $msg = "Hello,<br> You requested for a new password. To confirm <a href='$link'>click here</a>.<br>If you can't access copy this to your browser<br/>$link  <br><br>Regards<br><small>Note: Dont reply to this email. If you got this email by mistake then ignore this email.</small>";
-            if(mail($email, $sub, $msg,$from))
+            if($options->sendMail($email, $sub, $msg, $from))
                 $page->success = "An email with instructions was sent !";
         }
 
@@ -43,9 +42,9 @@ if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token']
             header("Location: $set->url");
             exit;
         }
-        if($usr = $db->get_row("SELECT `userid` FROM `$set->users_table` WHERE `key` = '".$db->escape($_GET['key'])."'")) {
-            if($db->query("UPDATE `$set->users_table` SET `password` = '".sha1($_POST['password'])."' WHERE `userid` = '$usr->userid'")) {
-                $db->query("UPDATE `$set->users_table` SET `key` = '0' WHERE `userid` = '$usr->userid'");
+        if($usr = $db->get_row("SELECT `userid` FROM `".MUS_PREFIX."users` WHERE `key` = '".$db->escape($_GET['key'])."'")) {
+            if($db->query("UPDATE `".MUS_PREFIX."users` SET `password` = '".sha1($_POST['password'])."' WHERE `userid` = '$usr->userid'")) {
+                $db->query("UPDATE `".MUS_PREFIX."users` SET `key` = '0' WHERE `userid` = '$usr->userid'");
                 $page->success = "Password was updated !";
             }
 
@@ -56,7 +55,7 @@ if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token']
         $password = $_POST['password'];
 
 
-        if(!($usr = $db->get_row("SELECT `userid` FROM `$set->users_table` WHERE `username` = '".$db->escape($name)."' AND `password` = '".sha1($password)."'")))
+        if(!($usr = $db->get_row("SELECT `userid` FROM `".MUS_PREFIX."users` WHERE `username` = '".$db->escape($name)."' AND `password` = '".sha1($password)."'")))
             $page->error = "Username or password are wrong !";
         else {
             if($_POST['r'] == 1){
@@ -118,7 +117,7 @@ if(isset($_GET['forget'])) {
         echo "<div class=\"alert alert-error\">Error !</div>";
         exit;
     }
-    if($usr = $db->get_row("SELECT `userid` FROM `$set->users_table` WHERE `key` = '".$db->escape($_GET['key'])."'")) {
+    if($usr = $db->get_row("SELECT `userid` FROM `".MUS_PREFIX."users` WHERE `key` = '".$db->escape($_GET['key'])."' AND `userid` = '".(int)$_GET['userid']."'")) {
     echo "<form class='form-horizontal well' action='#' method='post'>
         <fieldset>
             <legend>Reset</legend>

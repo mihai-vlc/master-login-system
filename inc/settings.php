@@ -15,5 +15,5 @@ $set->db_name = 'test'; // database name
 // extra details
 $set->site_name = "Demo Site"; // the name of the site
 $set->url = "http://localhost/auth"; // the url of the script
-$set->users_table = "users"; // the name of the table which will store the users
+$set->tables_prefix = "users"; // the name of the table which will store the users
 $set->admin_email = "ionutvmi@gmail.com"; // the name of the table which will store the users

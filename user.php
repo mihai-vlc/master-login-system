@@ -10,12 +10,12 @@ if($_POST) {
 	if(isset($_GET['password'])) {
 		$opass = $_POST['oldpass'];
 		$npass = $_POST['newpass'];
-		if($db->get_row("SELECT `userid` FROM `$set->users_table` WHERE `userid` = '".$_SESSION['user']."' 
+		if($db->get_row("SELECT `userid` FROM `".MUS_PREFIX."users` WHERE `userid` = '".$_SESSION['user']."' 
 				AND `password` = '".sha1($opass)."'")) {
 			if(!isset($npass[3]) || isset($npass[30]))
 				$page->error = "Password too short or too long !";
 			else
-				if($db->query("UPDATE `$set->users_table` SET `password` = '".sha1($npass)."' WHERE `userid` = '".$_SESSION['user']."'"))
+				if($db->query("UPDATE `".MUS_PREFIX."users` SET `password` = '".sha1($npass)."' WHERE `userid` = '".$_SESSION['user']."'"))
 					$page->success = "Password updated successfully !";
 
 		} else 
@@ -28,7 +28,7 @@ if($_POST) {
 	  if(!preg_match('/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/', $email)) 
 	    $page->error = "Email address is not valid.";
 	  else 
-	  	if($db->query("UPDATE `$set->users_table` SET `email` = '".$db->escape($email)."' WHERE `userid` = '".$_SESSION['user']."'")) {
+	  	if($db->query("UPDATE `".MUS_PREFIX."users` SET `email` = '".$db->escape($email)."' WHERE `userid` = '".$_SESSION['user']."'")) {
 	  		$page->success = "Your info was saved !";
 	  		$user->filter->email = htmlentities($email, ENT_QUOTES);
 	  	}

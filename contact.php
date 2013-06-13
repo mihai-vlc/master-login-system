@@ -6,9 +6,7 @@ include "inc/init.php";
 $page->title = "Contact to ". $set->site_name;
 
 
-$page->navbar = $presets->GenerateNavbar();
-
-$page->navbar[1][1]['class'] = 'active'; // we highlith the contact link
+$presets->setActive("contact"); // we highlith the contact link
 
 
 if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token'])) {
@@ -16,16 +14,14 @@ if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token']
 	  $email = $_POST['email'];
 	  $message = $_POST['message'];
 
-	  if(!preg_match('/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/', $email)) 
+	  if(!$options->isValidMail($email)) 
 	    $page->error = "Email address is not valid.";
 	  else if(!isset($message[10]))
 	    $page->error = "Message was too short !";
 	  else {
-            $from = 'MIME-Version: 1.0' . "\r\n";
-            $from .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-            $from .="From: ".$email;
+            $from ="From: ".$email;
             $sub = "Contact Admin $set->site_name !";
-            if(mail($email, $sub, $message,$from))
+            if($options->sendMail($email, $sub, $message, $from))
                 $page->success = "Your message was sent !";
 
 	  }

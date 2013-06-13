@@ -15,14 +15,6 @@ class User {
 	*/
 	var $db; 
 	/**
-	 * Stores the users table name.
-	*/
-	var $table;
-	/**
-	 * The name of the auto_increment column in users table, it will be stored in session to identify the user
-	*/
-	var $auto_increment;
-	/**
 	 * Stores the users details encoded with htmlentities()
 	*/
 	var $filter;
@@ -31,16 +23,14 @@ class User {
 	*/
 	var $data;
 
-	function __construct($db, $table = 'users', $auto_increment = 'userid') {
+	function __construct($db) {
 		$this->db = $db;
-		$this->table = $table;
-		$this->auto_increment = $auto_increment;
 		$this->data = new stdClass();
 		$this->filter = array();
 
 
 		if($this->islg()){ // set some vars
-			$this->data =$db->get_row("SELECT * FROM `$table` WHERE `$this->auto_increment` = '".$db->escape($_SESSION['user'])."'");
+			$this->data =$db->get_row("SELECT * FROM `".MUS_PREFIX."users` WHERE `userid` = '".$db->escape($_SESSION['user'])."'");
 	
 			foreach ($this->data as $k => $v) {
 				$this->filter[$k] = htmlentities($v, ENT_QUOTES);
@@ -55,6 +45,7 @@ class User {
 			// by doing this we won't have to do an extra check to display user or `guest` on the site
 			$this->filter = new stdClass();
 			$this->filter->username = "Guest";
+			$this->data->userid = 0;
 		}
 	}
 	/**
@@ -67,6 +58,13 @@ class User {
 		return false;
 	}
 
+	function getAvatar($userid = false) {
+		if(!$userid) 
+			return "http://www.gravatar.com/avatar/".md5($this->data->email);
+		
+		$u = $this->db->get_row("SELECT `email` FROM `".MUS_PREFIX."users` WHERE `userid` = '".(int)$userid."'");
+		return "http://www.gravatar.com/avatar/".md5($u->email);
 
+	}
 
 }

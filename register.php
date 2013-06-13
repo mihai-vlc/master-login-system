@@ -25,13 +25,13 @@ if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token']
   if(!isset($password[3]) || isset($password[30]))
     $page->error = "Password too short or too long !";
 
-  if(!preg_match('/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/', $email)) 
+  if(!$options->isValidMail($email)) 
     $page->error = "Email address is not valid.";
 
-  if($db->get_row("SELECT * FROM `$set->users_table` WHERE `username` = '".$db->escape($name)."'"))
+  if($db->get_row("SELECT * FROM `".MUS_PREFIX."users` WHERE `username` = '".$db->escape($name)."'"))
     $page->error = "Username already in use !";
 
-  if($db->get_row("SELECT * FROM `$set->users_table` WHERE `email` = '".$db->escape($email)."'"))
+  if($db->get_row("SELECT * FROM `".MUS_PREFIX."users` WHERE `email` = '".$db->escape($email)."'"))
     $page->error = "Email already in use !";
 
 
@@ -42,7 +42,7 @@ if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token']
       "email" => $email
       );
 
-    if($id = $db->insert_array($set->users_table, $user_data)) {
+    if($id = $db->insert_array(MUS_PREFIX."users", $user_data)) {
       $page->success = 1;
       $_SESSION['user'] = $id; // we automatically login the user
     }

@@ -5,7 +5,7 @@ if($page->navbar == array())
     $page->navbar = $presets->GenerateNavbar();
 
 if(!$user->islg()) // if it's not logged in we hide the user menu
-    unset($page->navbar[2]);
+    unset($page->navbar[count($page->navbar)-1]);
 
 
 ?>
@@ -53,23 +53,34 @@ if(!$user->islg()) // if it's not logged in we hide the user menu
                     </a>
                     <a class="brand" href="<?php echo $set->url; ?>"><?php echo $set->site_name; ?></a>
                     <div class="nav-collapse collapse">
-                        <ul class="nav" style="width:85%">
+                        <ul class="nav pull-left">
 <?php
 // we generate a simple menu this may need to be ajusted depending on your needs
 // but it should be ok for most common items
 foreach ($page->navbar as $key => $v) {
+
     if ($v[0] == 'item') {
     
-        echo "\n\t\t<li".($v[1]['class'] ? " class='".$v[1]['class']."'" : "")."><a href='".$v[1]['href']."'>".$v[1]['name']."</a></li>";
+        echo "<li".($v[1]['class'] ? " class='".$v[1]['class']."'" : "").">
+            <a href='".$v[1]['href']."'>".$v[1]['name']."</a></li>";
     
     } else if($v[0] == 'dropdown') {
 
-        echo "\n\t\t<li class='dropdown".($v['class'] ? " ".$v['class'] : "")."'".($v['style'] ? " style='".$v['style']."'" : "").">
-            \t<a href='#' class='dropdown-toggle' data-toggle='dropdown'>".$v['name']." <b class='caret'></b></a>
-            \n\t\t<ul class='dropdown-menu'>";
+        echo "<li class='dropdown".
+            // extra classes 
+            ($v['class'] ? " ".$v['class'] : "")."'".
+            // extra style
+            ($v['style'] ? " style='".$v['style']."'" : "").">
+            
+            <a href='#' class='dropdown-toggle' data-toggle='dropdown'>".$v['name']." <b class='caret'></b></a>
+            <ul class='dropdown-menu'>";
         foreach ($v[1] as $k => $v) 
-            echo "\n\t\t\t<li".($v['class'] ? " class='".$v['class']."'" : "")."><a href='".$v['href']."'>".$v['name']."</a></li>";                                
-        echo "\n\t\t</ul></li>";
+            echo "<li".
+                
+                ($v['class'] ? " class='".$v['class']."'" : "").">
+
+                <a href='".$v['href']."'>".$v['name']."</a></li>";                                
+        echo "</ul></li>";
 
     }
     
@@ -78,17 +89,16 @@ foreach ($page->navbar as $key => $v) {
 
 if(!$user->islg()) { 
 
-echo "<span class='pull-right'>
+echo "</ul><span class='pull-right'>
         <a href='$set->url/register.php' class='btn btn-primary btn-small'>Sign Up</a>
         <a href='$set->url/login.php' class='btn btn-small'>Login</a>
     </span>
     ";
 }
 
-echo "</ul>
+echo "
 
-                    </div><!--/.nav-collapse -->
-                </div>
-            </div>
+            </div><!--/.nav-collapse -->
         </div>
-";
+    </div>
+</div>";
