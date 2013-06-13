@@ -1,10 +1,11 @@
 master-login-system
 ===================
 
-A simple login system build upon bootstrap
+A simple login system build upon bootstrap (still in development)
 
 
 == Install == 
+
 1. Upload the files to your server
 
 2. Load the sql data from the sql file
