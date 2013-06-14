@@ -1,3 +1,4 @@
+
 <?php
 /**
  * Presets class
@@ -20,7 +21,7 @@ class presets {
 
 
       $var[] = array("item",
-                      array("href" => $set->url."/users.php",
+                      array("href" => $set->url."/users_list.php",
                             "name" => "User List",
                             "class" => $this->isActive("userslist")),
                       "id" => "userslist");
@@ -50,7 +51,7 @@ class presets {
                                        "name" => "<i class=\"icon-user\"></i> My Profile",
                                        "class" => 0),
                               1 => array("href" => $set->url."/user.php",
-                                       "name" => "<i class=\"icon-cog\"></i>Edit info",
+                                       "name" => "<i class=\"icon-cog\"></i> Edit info",
                                        "class" => 0),
 
                               2 => array("href" => $set->url."/logout.php",

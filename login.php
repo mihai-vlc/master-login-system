@@ -84,9 +84,9 @@ $_SESSION['token'] = sha1(rand()); // random token
 
 
 if(isset($page->error))
-  echo "<div class=\"alert alert-error\">".$page->error."</div>";
+  $options->error($page->error);
 else if(isset($page->success))
-  echo "<div class=\"alert alert-success\">".$page->success."</div>";
+  $options->success($page->success);
 
 
 if(isset($_GET['forget'])) {

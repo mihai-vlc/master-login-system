@@ -45,6 +45,7 @@ if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token']
     if($id = $db->insert_array(MUS_PREFIX."users", $user_data)) {
       $page->success = 1;
       $_SESSION['user'] = $id; // we automatically login the user
+      $user = new User($db);
     }
 
   }
@@ -61,13 +62,18 @@ $_SESSION['token'] = sha1(rand()); // random token
 $extra_content = ''; // holds success or error message
 
 if(isset($page->error))
-  $extra_content = "<div class=\"alert alert-error\">".$page->error."</div>";
+  $extra_content = $options->error($page->error);
 
 if(isset($page->success)) {
-
-  $extra_content = "<div class=\"alert alert-success\"><p><strong>Your account was successfully registered !</strong></p></div>
-  <div class='content'> <a class='btn btn-primary' href='$set->url'>Start exploring</a>
-  ";
+  
+  echo "<div class='container'>
+    <div class='span3 hidden-phone'></div>
+    <div class='span6 well'>
+    <h1>Congratulations !</h1>";
+    $options->success("<p><strong>Your account was successfully registered !</strong></p>");
+    echo " <a class='btn btn-primary' href='$set->url'>Start exploring</a>
+    </div>
+  </div>";
 
 
 } else {

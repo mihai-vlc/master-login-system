@@ -1,6 +1,5 @@
 <?php
-// in case we forget to define $page->navbar or we just want to use the default values
-
+// we generate the navbar components in case they weren't before
 if($page->navbar == array())
     $page->navbar = $presets->GenerateNavbar();
 
@@ -55,7 +54,7 @@ if(!$user->islg()) // if it's not logged in we hide the user menu
                     <div class="nav-collapse collapse">
                         <ul class="nav pull-left">
 <?php
-// we generate a simple menu this may need to be ajusted depending on your needs
+// we generate a simple menu this may need to be adjusted depending on your needs
 // but it should be ok for most common items
 foreach ($page->navbar as $key => $v) {
 

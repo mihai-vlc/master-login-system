@@ -33,4 +33,14 @@ if(!$user->islg() && isset($_COOKIE['user']) && isset($_COOKIE['pass'])) {
 	 	$_SESSION['user'] = $usr->userid;
 	 	$user = new User($db);
 
+} else {
+	if(!isset($_SESSION['last_log']))
+		$_SESSION['last_log'] = 0;
+	
+	$time = time();
+
+	if($_SESSION['last_log'] < $time - 60 * 2){ // we update the db if more then 2 minutes passed since the last update
+		$db->query("UPDATE `".MUS_PREFIX."users` SET `lastactive` = '".$time."' WHERE `userid`='".$user->data->userid."'");
+		$_SESSION['last_log'] = $time;
+	}
 }

@@ -39,9 +39,9 @@ echo "<div class='container'>
 
 
 if(isset($page->error))
-  echo "<div class=\"alert alert-error\">".$page->error."</div>";
+  $options->error($page->error);
 else if(isset($page->success))
-  echo "<div class=\"alert alert-success\">".$page->success."</div>";
+  $options->success($page->success);
 
 	echo "<form class='form-horizontal well' action='#' method='post'>
 		        <fieldset>
