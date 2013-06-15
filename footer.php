@@ -1,5 +1,63 @@
 <hr>
 
+<?php
+	if(!isset($_SESSION['token']))
+		$_SESSION['token'] = sha1(rand()); // random token
+
+echo "
+
+<div class='modal hide' id='loginModal'>
+    <div class='modal-header'>
+        <button type='button' class='close' data-dismiss='modal'>✕</button>
+        <h3>Login</h3>
+    </div>
+        <div class='modal-body' style='text-align:center;'>
+        <div class='row-fluid'>
+            <div class='span10 offset1'>
+                <div id='modalTab'>
+                    <div class='tab-content'>
+                        <div class='tab-pane active' id='login'>
+                            <form method='post' action='$set->url/login.php' name='login_form'>
+                                <p><input type='text' class='span12' name='name' placeholder='Username'></p>
+                                <p><input type='password' class='span12' name='password' placeholder='Password'></p>
+                                <p>
+                                	<input class='pull-left' type='checkbox' name='r' value='1' id='rm'>  
+                                	<label class='pull-left' for='rm'>Remember Me</label>
+                                </p>
+                                <div class='clearfix'></div>
+
+                                <input type='hidden' name='token' value='".$_SESSION['token']."'>
+                                
+                                <p><button type='submit' class='btn btn-primary'>Sign in</button>
+                                <a href='#forgotpassword' data-toggle='tab'>Forgot Password?</a>
+                                </p>
+                            </form>
+                        </div>
+                        <div class='tab-pane fade' id='forgotpassword'>
+                            <form method='post' action='$set->url/login.php?forget=1' name='forgot_password'>
+                                <p>Hey this stuff happens, send us your email and we'll reset it for you!</p>
+                                <input type='text' class='span12' name='email' placeholder='Email'>
+                                <p><button type='submit' class='btn btn-primary'>Submit</button>
+                                
+                                <input type='hidden' name='token' value='".$_SESSION['token']."'>
+
+                                <a href='#login' data-toggle='tab'>Wait, I remember it now!</a>
+                                </p>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+";
+
+?>
+
+
+
+
 <div class="container">	
 <div class="row-fluid">
 				<div class="span12">

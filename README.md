@@ -15,7 +15,7 @@ A simple login system build upon bootstrap (still in development)
 
 == ScreenShoots ==
 
-http://puu.sh/3fIVN.jpg - users list
+http://puu.sh/3gtZd.png - users list
 
 http://puu.sh/34xRK.png - login form
 

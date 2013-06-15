@@ -90,7 +90,8 @@ if(!$user->islg()) {
 
 echo "</ul><span class='pull-right'>
         <a href='$set->url/register.php' class='btn btn-primary btn-small'>Sign Up</a>
-        <a href='$set->url/login.php' class='btn btn-small'>Login</a>
+        <!-- <a href='$set->url/login.php' class='btn btn-small'>Login</a> -->
+        <a href='#loginModal' data-toggle='modal' class='btn btn-small'>Login</a>
     </span>
     ";
 }
@@ -101,3 +102,7 @@ echo "
         </div>
     </div>
 </div>";
+
+
+
+flush(); // we flush the content so the browser can start the download of css/js
