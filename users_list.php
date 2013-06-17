@@ -68,10 +68,10 @@ $pagination = new pagination($total_results, $page_number, $perpage);
 foreach($data as $u) {
 	$content .= "<li class='span5 clearfix'>
   <div class='thumbnail clearfix'>
-	<a href='$set->url/profile.php?u=$u->userid'><img src='".$user->getAvatar($u->userid)."' alt='".$options->html($u->username)."' class='pull-left clearfix' style='margin-right:10px'>
+	<a href='$set->url/profile.php?u=$u->userid'><img src='".$user->getAvatar($u->userid)."' width='80' alt='".$options->html($u->username)."' class='pull-left clearfix' style='margin-right:10px'>
     <div class='caption' class='pull-left'>
       <h4>      
-	      <a href='$set->url/profile.php?u=$u->userid'>".$options->html($u->username)."</a>
+	      <a href='$set->url/profile.php?u=$u->userid'>".$user->showName($u->userid)."</a>
       </h4>
       <small><b>Last seen: </b> ".$options->tsince($u->lastactive)."</small>
       

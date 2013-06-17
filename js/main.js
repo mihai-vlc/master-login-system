@@ -1,5 +1,9 @@
 $(document).ready(function(){
- 
+
+$('.container').tooltip({
+    selector: "a[rel=tooltip]"
+});
+
  $('#contact-form').validate(
  {
   rules: {

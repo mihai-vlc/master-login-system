@@ -55,10 +55,10 @@ class Options
 	 * @return string       time elapssed
 	 * credits: http://stackoverflow.com/a/2916189/1579481
 	 */
-	public function tsince($time)
+	public function tsince($time, $end_msg = 'ago')
 	{
 
-	    $time = time() - $time; // to get the time since that moment
+	    $time = abs(time() - $time); // to get the time since that moment
 
 	    if($time == 0)
 	    	return "Just now";
@@ -76,7 +76,7 @@ class Options
 	    foreach ($tokens as $unit => $text) {
 	        if ($time < $unit) continue;
 	        $numberOfUnits = floor($time / $unit);
-	        return $numberOfUnits.' '.$text.(($numberOfUnits>1)?'s':'').' ago';
+	        return $numberOfUnits.' '.$text.(($numberOfUnits>1)?'s':'').' '. $end_msg;
 	    }
  
 	}
@@ -87,6 +87,7 @@ class Options
 	 * @return void
 	 */
 	public function fError($error) {
+		global $set;
 		echo "<div style='margin:0 auto;text-align:center;width:80%'><div class='alert alert-error'>$error</div></div>";
 		include "footer.php";
 		die();
@@ -95,11 +96,15 @@ class Options
 	/**
 	 * It will display the error
 	 * @param  string $error the error to be displayed
+	 * @param  int $return if 1 it will return instead of echo it !
 	 * @return void        
 	 */
-	public function error($error='')
+	public function error($error='', $return = 0)
 	{
-		echo "<div class='alert alert-error'>$error</div>";
+		$html = "<div class='alert alert-error'>$error</div>";
+		if($return)
+			return $html;
+		echo $html;
 	}
 
 	/**
@@ -111,6 +116,20 @@ class Options
 	public function success($message='', $return = 0)
 	{
 		$html = "<div class=\"alert alert-success\">".$message."</div>";
+		if($return)
+			return $html;
+
+		echo $html;
+	}
+	/**
+	 * It will show an info message
+	 * @param  string $message the message to be displayed !
+	 * @param  int $return if 1 it will return instead of echo it !
+	 * @return void
+	 */
+	public function info($message='', $return = 0)
+	{
+		$html = "<div class=\"alert alert-info\">".$message."</div>";
 		if($return)
 			return $html;
 

@@ -21,17 +21,17 @@ if(!$user->islg()) // if it's not logged in we hide the user menu
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
-        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="<?php echo $set->url; ?>/css/bootstrap.min.css">
         <style>
             body {
                 padding-top: 60px;
                 padding-bottom: 40px;
             }
         </style>
-        <link rel="stylesheet" href="css/bootstrap-responsive.min.css">
-        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="<?php echo $set->url; ?>/css/bootstrap-responsive.min.css">
+        <link rel="stylesheet" href="<?php echo $set->url; ?>/css/main.css">
 
-        <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+        <script src="<?php echo $set->url; ?>/js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
         
 
     </head>
@@ -105,4 +105,22 @@ echo "
 
 
 
+
+if($user->data->banned) {
+    $_banned = $user->getBan();
+    $options->error("You were banned by <a href='$set->url/profile.php?u=$_banned->by'>".$user->showName($_banned->by)."</a> for `<i>".$options->html($_banned->reason)."</i>`.
+        Your ban will expire in ".$options->tsince($_banned->until, "from now.")."
+        ");
+}
+
+
+if(isset($_SESSION['success'])){
+    $options->success($_SESSION['success']);
+    unset($_SESSION['success']);
+}
+if(isset($_SESSION['error'])){
+    $options->error($_SESSION['error']);
+    unset($_SESSION['error']);
+
+}
 flush(); // we flush the content so the browser can start the download of css/js

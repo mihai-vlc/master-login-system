@@ -11,17 +11,25 @@
 class User {
 
 	/**
-	 * Stores the object of the mysql class 
+	 * Stores the object of the mysql class
+	 * @var object 
 	*/
 	var $db; 
 	/**
 	 * Stores the users details encoded with htmlentities()
+	 * @var object
 	*/
 	var $filter;
 	/**
 	 * stores the user data without any filter
+	 * @var object
 	*/
 	var $data;
+	/**
+	 * contains the group details about the current user
+	 * @var object
+	 */
+	var $group;
 
 	function __construct($db) {
 		$this->db = $db;
@@ -30,7 +38,7 @@ class User {
 
 
 		if($this->islg()){ // set some vars
-			$this->data =$db->get_row("SELECT * FROM `".MUS_PREFIX."users` WHERE `userid` = '".$db->escape($_SESSION['user'])."'");
+			$this->data = $this->grabData($_SESSION['user']);
 	
 			foreach ($this->data as $k => $v) {
 				$this->filter[$k] = htmlentities($v, ENT_QUOTES);
@@ -46,7 +54,11 @@ class User {
 			$this->filter = new stdClass();
 			$this->filter->username = "Guest";
 			$this->data->userid = 0;
+			$this->data->groupid = 1;
+			$this->data->banned = 0;
 		}
+
+		$this->group = $this->getGroup();
 	}
 	/**
 	 * Checks if user is logged in
@@ -57,14 +69,121 @@ class User {
 			return true;
 		return false;
 	}
-
-	function getAvatar($userid = false) {
-		if(!$userid) 
-			return "http://www.gravatar.com/avatar/".md5($this->data->email);
-		
-		$u = $this->db->get_row("SELECT `email` FROM `".MUS_PREFIX."users` WHERE `userid` = '".(int)$userid."'");
-		return "http://www.gravatar.com/avatar/".md5($u->email);
+	/**
+	 * Gets the url to the avatar of the user
+	 * @param  int $userid the user id if none given it will take the current user
+	 * @return string          url to the image
+	 */
+	function getAvatar($userid = 0, $size = null) {
+		global $set;
+		if($size)
+			$size = "?s=$size";
+		if(!$userid) {
+			if($this->data->showavt)
+				return "http://www.gravatar.com/avatar/".md5($this->data->email).$size;
+			else
+				return "$set->url/img/default-avatar.png";
+		}
+		$u = $this->db->get_row("SELECT `email`, `showavt` FROM `".MUS_PREFIX."users` WHERE `userid` = '".(int)$userid."'");
+		if($u->showavt)	
+			return "http://www.gravatar.com/avatar/".md5($u->email).$size;
+		else	
+			return "$set->url/img/default-avatar.png";
 
 	}
+
+	/**
+	 * get the group details about the user
+	 * @param  int $userid the user id if none given it will take the current user
+	 * @return object          the object with the group details
+	 */
+	function getGroup($userid = 0) {
+
+		if(!$userid)
+			return $this->db->get_row("SELECT * FROM `".MUS_PREFIX."groups` WHERE `groupid` = '".$this->data->groupid."'");
+
+		$u = $this->db->get_row("SELECT `groupid` FROM `".MUS_PREFIX."users` WHERE `userid` = '".(int)$userid."'");
+		return $this->db->get_row("SELECT * FROM `".MUS_PREFIX."groups` WHERE `groupid` = '".$u->groupid."'");
+	}
+	/**
+	 * get the ban details about the user
+	 * @param  int $userid the user id if none given it will take the current user
+	 * @return object          the object with the ban details
+	 */
+	function getBan($userid = 0) {
+
+		if(!$userid)
+			$userid = $this->data->userid;
+		return $this->db->get_row("SELECT * FROM `".MUS_PREFIX."banned` WHERE `userid` = '".(int)$userid."'");
+	}
+
+	/**
+	 * shows the username of the used formated according to the group
+	 * @param  integer $userid the user id if none provided it will use the current one
+	 * @return string          formated username
+	 */
+	function showName($userid = 0) {
+
+		if(!$userid)
+			if($this->data->banned)
+				return "<strike>".$this->filter->username."</strike>";
+			else	
+				return "<font color='".$this->group->color."'>".$this->filter->username."</font>";
+
+		$u = $this->db->get_row("SELECT `username`,`banned` FROM `".MUS_PREFIX."users` WHERE `userid` = '".(int)$userid."'");
+		$group = $this->getGroup($userid);
+	
+		if($u->banned)
+			return "<strike>".htmlentities($u->username, ENT_QUOTES)."</strike>";		
+		else	
+			return "<font color='".$group->color."'>".htmlentities($u->username, ENT_QUOTES)."</font>";		
+	}
+
+
+
+	/**
+	 * checks if `userid2` has the privilege to act on/over userid
+	 * @param  integer  $userid  the user acted on
+	 * @param  integer $userid2 the user who wants to act
+	 * @return boolean          true if userid2 can
+	 */
+	function hasPrivilege($userid, $userid2 = 0) {
+		
+		$group = $this->getGroup($userid);		
+		
+		if(!$userid2) {
+			if(($this->group->type > $group->type) || (($this->group->type == $group->type) && ($this->group->priority > $group->priority)))
+				return TRUE;
+			return FALSE;
+		}
+
+		$group2 = $this->getGroup($userid2);		
+		
+		if(($group2->type > $group->type) || (($group2->type == $group->type) && ($group2->priority > $group->priority)))
+			return TRUE;
+		return FALSE;
+
+
+
+	}
+	/**
+	 * checks if the provoded id is valid
+	 * @param  integer $userid id to be checked
+	 * @return boolean          true if exists
+	 */
+	function exists($userid) {
+		if($this->db->get_row("SELECT `userid` FROM `".MUS_PREFIX."users` WHERE `userid` = '".(int)$userid."'"))
+			return TRUE;
+		return FALSE;
+	}
+	/**
+	 * grabs the data about the user
+	 * @param  integer $userid the id to grab data for
+	 * @return object         data about the specified id
+	 */
+	function grabData($userid) {
+		return $this->db->get_row("SELECT * FROM `".MUS_PREFIX."users` WHERE `userid` = '".(int)$userid."'");
+	}
+
 
 }
