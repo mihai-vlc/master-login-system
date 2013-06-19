@@ -5,6 +5,8 @@ include "../inc/init.php";
 
 $page->title = "Admin Panel";
 
+$presets->setActive("adminpanel");
+
 include "../header.php";
 
 ?>
@@ -64,3 +66,9 @@ include "../header.php";
 </div><!--/row-->
 
 </div><!--/.fluid-container-->
+
+
+
+<?php
+include '../footer.php';
+?>

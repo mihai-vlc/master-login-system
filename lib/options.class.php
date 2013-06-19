@@ -55,9 +55,8 @@ class Options
 	 * @return string       time elapssed
 	 * credits: http://stackoverflow.com/a/2916189/1579481
 	 */
-	public function tsince($time, $end_msg = 'ago')
-	{
-
+	public function tsince($time, $end_msg = 'ago') {
+ 
 	    $time = abs(time() - $time); // to get the time since that moment
 
 	    if($time == 0)
@@ -87,6 +86,7 @@ class Options
 	 * @return void
 	 */
 	public function fError($error) {
+
 		global $set;
 		echo "<div style='margin:0 auto;text-align:center;width:80%'><div class='alert alert-error'>$error</div></div>";
 		include "footer.php";
@@ -99,8 +99,7 @@ class Options
 	 * @param  int $return if 1 it will return instead of echo it !
 	 * @return void        
 	 */
-	public function error($error='', $return = 0)
-	{
+	public function error($error='', $return = 0) {
 		$html = "<div class='alert alert-error'>$error</div>";
 		if($return)
 			return $html;
@@ -113,8 +112,7 @@ class Options
 	 * @param  int $return if 1 it will return instead of echo it !
 	 * @return void
 	 */
-	public function success($message='', $return = 0)
-	{
+	public function success($message='', $return = 0) {
 		$html = "<div class=\"alert alert-success\">".$message."</div>";
 		if($return)
 			return $html;
@@ -127,13 +125,42 @@ class Options
 	 * @param  int $return if 1 it will return instead of echo it !
 	 * @return void
 	 */
-	public function info($message='', $return = 0)
-	{
+	public function info($message='', $return = 0) {
+		
 		$html = "<div class=\"alert alert-info\">".$message."</div>";
 		if($return)
 			return $html;
 
 		echo $html;
+	}
+
+	
+	/**
+	 * it will return the query string as hidden fields or as url
+	 * @param  string $type   type of output
+	 * @param  array  $ignore ignored elements
+	 * @return string         
+	 */
+	public function queryString($type = '', $ignore = array()) {
+		
+		$result = '';
+		foreach($_GET as $k => $v) {
+			if(in_array($k, $ignore))
+				continue;
+
+			if($type == 'hidden') {
+				$result .= "<input type='hidden' name='".urlencode($k)."' value='".urlencode($v)."'>";
+			} else {
+				$result[] = urlencode($k)."=".urlencode($v);
+			}
+		}
+
+		if(is_array($result))
+			return "?".implode("&", $result);
+
+		return $result;
+
+
 	}
 
 

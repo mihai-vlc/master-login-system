@@ -22,6 +22,8 @@ if(!$user->islg()) // if it's not logged in we hide the user menu
         <meta name="viewport" content="width=device-width">
 
         <link rel="stylesheet" href="<?php echo $set->url; ?>/css/bootstrap.min.css">
+        <!-- join the dark side :) -->
+        <!-- <link rel="stylesheet" href="<?php echo $set->url; ?>/css/darkstrap.min.css"> -->
         <style>
             body {
                 padding-top: 60px;
@@ -107,10 +109,26 @@ echo "
 
 
 if($user->data->banned) {
+  
+    // we delete the expired banned
+    $_unban = $db->select("SELECT `userid` FROM `".MUS_PREFIX."banned` WHERE `until` < ".time());
+    if($_unban) 
+        foreach ($_unban as $_usr) {
+            $db->query("DELETE FROM `".MUS_PREFIX."banned` WHERE `userid` = '$_usr->userid'");
+            $db->query("UPDATE `".MUS_PREFIX."users` SET `banned` = '0' WHERE `userid` = '$_usr->userid'");             
+        }
+
+
     $_banned = $user->getBan();
+    if($_banned)
     $options->error("You were banned by <a href='$set->url/profile.php?u=$_banned->by'>".$user->showName($_banned->by)."</a> for `<i>".$options->html($_banned->reason)."</i>`.
         Your ban will expire in ".$options->tsince($_banned->until, "from now.")."
         ");
+
+
+    
+
+
 }
 
 

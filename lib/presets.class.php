@@ -25,6 +25,7 @@ class presets {
                             "name" => "User List",
                             "class" => $this->isActive("userslist")),
                       "id" => "userslist");
+
       $var[] = array("item",
                       array("href" => $set->url."/contact.php",
                             "name" => "Contact",
@@ -44,6 +45,14 @@ class presets {
                       "style" => 0,
                       "name" => "Extra",
                       "id" => "extra");      
+      if($user->group->type == 3) // we make it visible for admins only
+      $var[] = array("item",
+                      array("href" => $set->url."/admin",
+                            "name" => "Admin Panel",
+                            "class" => $this->isActive("adminpanel")),
+                      "id" => "adminpanel");
+
+
 
       // keep this always the last one or edit hrader.php:8
       $var[] = array("dropdown",

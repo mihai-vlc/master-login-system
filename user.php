@@ -4,18 +4,33 @@ include "inc/init.php";
 if(!$user->islg())
 	header("Location: ".$set->url);
 
-$page->title = "Edit info to ". $set->site_name;
+
+if(isset($_GET['id']) && $user->group->canedit && $user->exists($_GET['id'])) {
+	$uid = (int)$_GET['id'];
+	$can_edit = 1;
+}else{
+	$uid = $user->data->userid;
+	$can_edit = 0;
+}
+$u = $db->get_row("SELECT * FROM `".MUS_PREFIX."users` WHERE `userid` = '$uid'");
+
+
+$page->title = "Edit info of ". $options->html($u->username);
 
 if($_POST) {
-	if(isset($_GET['password'])) {
+	if(isset($_GET['password']) && ($user->data->userid == $u->userid)) {
 		$opass = $_POST['oldpass'];
 		$npass = $_POST['newpass'];
-		if($db->get_row("SELECT `userid` FROM `".MUS_PREFIX."users` WHERE `userid` = '".$_SESSION['user']."' 
+		$npass2 = $_POST['newpass2'];
+		if($db->get_row("SELECT `userid` FROM `".MUS_PREFIX."users` WHERE `userid` = '".$u->userid."' 
 				AND `password` = '".sha1($opass)."'")) {
+
 			if(!isset($npass[3]) || isset($npass[30]))
 				$page->error = "Password too short or too long !";
+			else if($npass != $npass2)
+				$page->error = "New passwords don't match !";
 			else
-				if($db->query("UPDATE `".MUS_PREFIX."users` SET `password` = '".sha1($npass)."' WHERE `userid` = '".$_SESSION['user']."'"))
+				if($db->query("UPDATE `".MUS_PREFIX."users` SET `password` = '".sha1($npass)."' WHERE `userid` = '".$u->userid."'"))
 					$page->success = "Password updated successfully !";
 
 		} else 
@@ -23,14 +38,41 @@ if($_POST) {
 
 	} else {
       
-      $email = $_POST['email'];
+      	$email = $_POST['email'];
+
+
+      	$extra = '';
+      	if($can_edit) {
+	      	$username = $_POST['username'];
+	      	$password = $_POST['password'];
+	      	if(isset($_POST['groupid']))
+		      	$groupid = $_POST['groupid'];
+
+
+	      	$extra = ", `username` = '".$db->escape($username)."'";
+
+	      	if($user->isAdmin())
+	      		$extra .= ", `groupid` = '".$db->escape($groupid)."'";
+
+	      	if(!empty($password))
+	      		$extra .= ", `password` = '".sha1($password)."'";
+
+			if(!isset($username[3]) || isset($username[30]))
+			    $page->error = "Username too short or too long !";
+
+			if($user->isAdmin() && !$db->get_row("SELECT `groupid` FROM `".MUS_PREFIX."groups` WHERE `groupid` = '".(int)$groupid."'"))
+				$page->error = "The group is invalid !";
+		}
+
+
+	  	if(!$options->isValidMail($email)) 
+	    	$page->error = "Email address is not valid.";
 	  
-	  if(!preg_match('/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/', $email)) 
-	    $page->error = "Email address is not valid.";
-	  else 
-	  	if($db->query("UPDATE `".MUS_PREFIX."users` SET `email` = '".$db->escape($email)."' WHERE `userid` = '".$_SESSION['user']."'")) {
-	  		$page->success = "Your info was saved !";
-	  		$user->filter->email = htmlentities($email, ENT_QUOTES);
+
+	  	if(!isset($page->error) && $db->query("UPDATE `".MUS_PREFIX."users` SET `email` = '".$db->escape($email)."' $extra WHERE `userid` = '".$u->userid."'")) {
+	  		$page->success = "Info was saved !";
+	  		// we make sure we show updated data
+			$u = $db->get_row("SELECT * FROM `".MUS_PREFIX."users` WHERE `userid` = '$u->userid'");
 	  	}
 	}
 }
@@ -43,12 +85,14 @@ echo "
 
 
 if(isset($page->error))
-  echo "<div class=\"alert alert-error\">".$page->error."</div>";
+  $options->error($page->error);
 else if(isset($page->success))
-  echo "<div class=\"alert alert-success\">".$page->success."</div>";
+  $options->success($page->success);
 
 
-if(isset($_GET['password'])) {
+if(isset($_GET['password']) && ($user->data->userid == $u->userid)) { 
+// we use this option only for personal profile
+// because you need to know the old password
 	echo "<form class='form-horizontal well' action='#' method='post'>
 		        <fieldset>
 		            <legend>Change Password</legend>
@@ -69,6 +113,14 @@ if(isset($_GET['password'])) {
 		                <input type='password' name='newpass' class='input-large'>
 		              </div>
 		            </div>
+		            <div class='control-group'>
+		              <div class='control-label'>
+		                <label>New Password Again</label>
+		              </div>
+		              <div class='controls'>
+		                <input type='password' name='newpass2' class='input-large'>
+		              </div>
+		            </div>
 
 		            <div class='control-group'>
 		              <div class='controls'>
@@ -83,26 +135,78 @@ if(isset($_GET['password'])) {
 
 	echo "<form class='form-horizontal well' action='#' method='post'>
 		        <fieldset>
-		            <legend>Edit Info</legend>
+		            <legend>Edit info of ".$options->html($u->username)."</legend>";
 
-		            <div class='control-group'>
-		              <div class='control-label'>
-		                <label>Email</label>
-		              </div>
-		              <div class='controls'>
-		                <input type='text' name='email' class='input-large' value='".$user->filter->email."'>
-		              </div>
-		            </div>
+if($can_edit) {
 
-		            <div class='control-group'>
-		              <div class='controls'>
-		              <button type='submit' id='submit' class='btn btn-primary'>Save</button>
-		              </div>
-		            </div>
-		          </fieldset>
-		    </form>
-		    <a href='?password=1'>Change Password</a>
-		    ";
+	$groups = $db->select("SELECT * FROM `".MUS_PREFIX."groups`");
+
+
+	// get the groups available
+	$show_groups = '';
+	foreach($groups as $group)
+		if($group->groupid != 1)
+			if($group->groupid == $u->groupid)
+				$show_groups .= "<option value='$group->groupid' selected='1'>".$group->name."</option>";
+			else
+				$show_groups .= "<option value='$group->groupid'>".$group->name."</option>";
+
+	echo "
+	    <div class='control-group'>
+	      <div class='control-label'>
+	        <label>Username</label>
+	      </div>
+	      <div class='controls'>
+	        <input type='text' name='username' class='input-large' value='".$options->html($u->username)."'>
+	      </div>
+	    </div>
+
+	    <div class='control-group'>
+	      <div class='control-label'>
+	        <label>Password</label>
+	      </div>
+	      <div class='controls'>
+	        <input type='text' name='password' class='input-large'><br/>
+	        <small>Leave blank if you don't want to change</small>
+	      </div>
+	    </div>
+
+		<div class='control-group'>
+		  <label class='control-label' for='selectbasic'>Group: </label>
+		  <div class='controls'>
+		    <select id='selectbasic' name='groupid' class='input-xlarge' ".($user->isAdmin() ? "" : "disabled='disabled'").">
+				$show_groups	      
+		    </select>
+		  </div>
+		</div> 
+	";
+
+
+}
+
+
+
+echo "
+        <div class='control-group'>
+          <div class='control-label'>
+            <label>Email</label>
+          </div>
+          <div class='controls'>
+            <input type='text' name='email' class='input-large' value='".$options->html($u->email)."'>
+          </div>
+        </div>
+
+        <div class='control-group'>
+          <div class='controls'>
+          <button type='submit' id='submit' class='btn btn-primary'>Save</button>
+          </div>
+        </div>
+      </fieldset>
+</form>";
+if(!$can_edit)
+	echo "<a href='?password=1'>Change Password</a>";
+
+
 }
 
 echo "</div>

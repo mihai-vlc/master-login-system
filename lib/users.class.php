@@ -152,7 +152,7 @@ class User {
 		$group = $this->getGroup($userid);		
 		
 		if(!$userid2) {
-			if(($this->group->type > $group->type) || (($this->group->type == $group->type) && ($this->group->priority > $group->priority)))
+			if(($this->group->type >=3) || ($this->group->type > $group->type) || (($this->group->type == $group->type) && ($this->group->priority > $group->priority)))
 				return TRUE;
 			return FALSE;
 		}
@@ -184,6 +184,23 @@ class User {
 	function grabData($userid) {
 		return $this->db->get_row("SELECT * FROM `".MUS_PREFIX."users` WHERE `userid` = '".(int)$userid."'");
 	}
+	/**
+	 * Checks if a user is admin
+	 * @param  integer $userid user to be checked if none provided we take the current user
+	 * @return boolean         true if yes
+	 */
+	function isAdmin($userid = 0) {
+		if(!$userid)
+			if($this->group->type >= 3)
+				return TRUE;
+			else
+				return FALSE;
 
+		$u = $this->db->get_row("SELECT `username`,`banned` FROM `".MUS_PREFIX."users` WHERE `userid` = '".(int)$userid."'");
+		$group = $this->getGroup($userid);
+		if($group->type >= 3)
+			return TRUE;
+		return FALSE;
+	}
 
 }

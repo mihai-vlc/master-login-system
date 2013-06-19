@@ -22,7 +22,7 @@ $show_content = '';
 
 
 
-if(($act == 'ban') && $user->group->canban) { 
+if(($act == 'ban') && $user->group->canban && ($user->data->userid != $u->userid)) { 
 
 	if($_POST) {
 		$period = $_POST['period'];

@@ -30,7 +30,7 @@ $show_actions = ''; // holds the actions links
 
 
 
-if($user->group->canban && $user->hasPrivilege($u->userid))
+if($user->group->canban && $user->hasPrivilege($u->userid) && ($user->data->userid != $u->userid))
 	$show_actions .= "<li><a href='$set->url/mod.php?act=ban&id=$u->userid'><i class='icon-ban-circle'></i> ".($u->banned ? "Un" : "")."Ban ".$options->html($u->username)."</a></li>";
 
 
@@ -51,8 +51,10 @@ if($user->data->userid == $u->userid) {
 
 
 echo "<div class='container'>
-	<h3 class='pull-left'>Profile of ".$options->html($u->username)."</h3>
-  	<div class='btn-group pull-right'>
+	<h3 class='pull-left'>Profile of ".$options->html($u->username)."</h3>";
+
+if($show_actions != '')
+echo "<div class='btn-group pull-right'>
   		<a class='btn dropdown-toggle' data-toggle='dropdown' href='#'>
     		Actions
     		<span class='caret'></span>
@@ -62,7 +64,9 @@ echo "<div class='container'>
   			$show_actions
   		
   		</ul>
-  	</div>
+  	</div>";
+
+echo "  	
   	<div class='clearfix'></div>
 	<hr>
 	<div class='row'>	

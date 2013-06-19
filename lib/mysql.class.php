@@ -124,6 +124,13 @@ if(extension_loaded('mysqli')) {
                 return mysqli_insert_id($this->link);
             return false;
         }
+        /**
+         * returns the error
+         * @return string
+         */
+        function err() {
+            return mysqli_error($this->link);
+        }
     }
 } else { // we use the old mysql
     class dbConn {
@@ -197,6 +204,9 @@ if(extension_loaded('mysqli')) {
             if(mysql_query($q, $this->link))
                 return mysql_insert_id($this->link);
             return false;
+        }
+        function err() {
+            return mysql_error();
         }
     }
 

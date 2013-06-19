@@ -12,7 +12,7 @@ $presets->setActive("userslist"); // we highlight the home link
 $content = ''; // will store the html code for users list
 
 if(!isset($_GET['page']))
-  $_GET['page'] = 1;
+  $page_number = 1;
 
 
 $sort_name = array("id", "name");
@@ -43,43 +43,52 @@ foreach ($sort_name as $k => $v) {
 
 
 
-// pagination
-$page_number = (int)$_GET['page'] <= 0 ? 1 : (int)$_GET['page']; // grab the page number
+// search
 
-$perpage = 20; // number of elements perpage
+$where = '';
 
-$total_results = $db->count("SELECT * FROM `".MUS_PREFIX."users`");
-
-if($page_number > ceil($total_results/$perpage))
-  $page_number = ceil($total_results/$perpage);
+if(isset($_GET['q'])) 
+  $where = "WHERE `username` LIKE '%".$db->escape($_GET['q'])."%'";
 
 
-$start = ($page_number - 1) * $perpage;
+if($total_results = $db->count("SELECT * FROM `".MUS_PREFIX."users` $where")) {
 
-$data = $db->select("SELECT * FROM `".MUS_PREFIX."users` ORDER BY $order_by LIMIT $start,$perpage");
+    // pagination
+    if(!isset($page_number))
+      $page_number = (int)$_GET['page'] <= 0 ? 1 : (int)$_GET['page']; // grab the page number
 
-$pagination = new pagination($total_results, $page_number, $perpage);
-
-
-
-
+    $perpage = 20; // number of elements perpage
 
 
-foreach($data as $u) {
-	$content .= "<li class='span5 clearfix'>
-  <div class='thumbnail clearfix'>
-	<a href='$set->url/profile.php?u=$u->userid'><img src='".$user->getAvatar($u->userid)."' width='80' alt='".$options->html($u->username)."' class='pull-left clearfix' style='margin-right:10px'>
-    <div class='caption' class='pull-left'>
-      <h4>      
-	      <a href='$set->url/profile.php?u=$u->userid'>".$user->showName($u->userid)."</a>
-      </h4>
-      <small><b>Last seen: </b> ".$options->tsince($u->lastactive)."</small>
-      
-      </div>
-    </div>
-  </li>";
-}
+    if($page_number > ceil($total_results/$perpage))
+      $page_number = ceil($total_results/$perpage);
 
+
+    $start = ($page_number - 1) * $perpage;
+
+    $data = $db->select("SELECT * FROM `".MUS_PREFIX."users` $where ORDER BY $order_by LIMIT $start,$perpage");
+
+
+    $pagination = new pagination($total_results, $page_number, $perpage);
+
+
+
+    foreach($data as $u) {
+    	$content .= "<li class='span5 clearfix'>
+      <div class='thumbnail clearfix'>
+    	<a href='$set->url/profile.php?u=$u->userid'><img src='".$user->getAvatar($u->userid)."' width='80' alt='".$options->html($u->username)."' class='pull-left clearfix' style='margin-right:10px'>
+        <div class='caption' class='pull-left'>
+          <h4>      
+    	      <a href='$set->url/profile.php?u=$u->userid'>".$user->showName($u->userid)."</a>
+          </h4>
+          <small><b>Last seen: </b> ".$options->tsince($u->lastactive)."</small>
+          
+          </div>
+        </div>
+      </li>";
+    }
+} else
+  $page->error = "No results were found !";
 
 
 
@@ -87,10 +96,21 @@ foreach($data as $u) {
 include 'header.php';
 
 
+
 echo "
 <div class='container'>
 
   <h3 class='pull-left'>Users on ".$set->site_name."</h3>
+
+  <div class='input-prepend pull-right'>
+    <form>
+      <span class='add-on'><i class='icon-search'></i></span>
+      <input class='span2' name='q' type='text' ".( isset($_GET['q']) ? "value='".$options->html($_GET['q'])."'" : "" )." placeholder='Search...'/>
+      ".$options->queryString("hidden", array("q"))."
+    </form>
+  </div>
+  <div class='clearfix'></div>
+
   <div class='btn-group pull-right'>
     <a class='btn btn' href='?sort=$sort&sort_type=".(!$sort_type ? 1 : 0)."'><i class='icon-chevron-".(!$sort_type ? 'up' : 'down')."'></i> Sort by ".$sort_name[$sort]."</a>
     <a class='btn btn dropdown-toggle' data-toggle='dropdown' href='#'><span class='caret'></span></a>
@@ -98,15 +118,29 @@ echo "
       $show_sort_options
     </ul>
   </div>
-  <div class='clearfix'></div>
-  <small>Showing ".($start+1)."-".($start+count($data))." out of ".$total_results."</small>
-  <hr>
+  <div class='clearfix'></div>";
 
-	<ul class='thumbnails'>
+  if(isset($data))
+    echo "<small>Showing ".($start+1)."-".($start+count($data))." out of ".$total_results."</small><hr>";
+  else
+    echo "<hr>";
+
+
+if(isset($page->error))
+  $options->error($page->error);
+else if(isset($page->success))
+  $options->success($page->success);
+
+
+echo "
+  <ul class='thumbnails'>
 		$content
 	</ul>
-$pagination->pages
+".(isset($pagination) ? $pagination->pages : "" )."
 </div>";
 
 
 include 'footer.php';
+
+
+
