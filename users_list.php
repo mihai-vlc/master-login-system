@@ -57,7 +57,7 @@ if($total_results = $db->count("SELECT * FROM `".MUS_PREFIX."users` $where")) {
     if(!isset($page_number))
       $page_number = (int)$_GET['page'] <= 0 ? 1 : (int)$_GET['page']; // grab the page number
 
-    $perpage = 20; // number of elements perpage
+    $perpage = 10; // number of elements perpage
 
 
     if($page_number > ceil($total_results/$perpage))
@@ -102,13 +102,14 @@ echo "
 
   <h3 class='pull-left'>Users on ".$set->site_name."</h3>
 
-  <div class='input-prepend pull-right'>
-    <form>
-      <span class='add-on'><i class='icon-search'></i></span>
-      <input class='span2' name='q' type='text' ".( isset($_GET['q']) ? "value='".$options->html($_GET['q'])."'" : "" )." placeholder='Search...'/>
-      ".$options->queryString("hidden", array("q"))."
-    </form>
-  </div>
+  <form class='form-search' action='?'>
+    <div class='input-append pull-right'>
+      <input class='span2 search-query' name='q' type='text' ".( isset($_GET['q']) ? "value='".$options->html($_GET['q'])."'" : "" )." placeholder='Search...'/>
+      <button type='submit' class='btn'><i class='icon-search'></i></button>
+
+      ".$options->queryString("hidden", array("q","page"))."
+    </div>
+  </form>
   <div class='clearfix'></div>
 
   <div class='btn-group pull-right'>

@@ -56,14 +56,17 @@ class presets {
 
       // keep this always the last one or edit hrader.php:8
       $var[] = array("dropdown",
-                      array(  0 => array("href" => $set->url."/profile.php?u=".$user->data->userid,
+                      array(  array("href" => $set->url."/profile.php?u=".$user->data->userid,
                                        "name" => "<i class=\"icon-user\"></i> My Profile",
                                        "class" => 0),
-                              1 => array("href" => $set->url."/user.php",
-                                       "name" => "<i class=\"icon-cog\"></i> Edit info",
+                              array("href" => $set->url."/user.php",
+                                       "name" => "<i class=\"icon-cog\"></i> Account settings",
+                                       "class" => 0),
+                              array("href" => $set->url."/privacy.php",
+                                       "name" => "<i class=\"icon-lock\"></i> Privacy settings",
                                        "class" => 0),
 
-                              2 => array("href" => $set->url."/logout.php",
+                              array("href" => $set->url."/logout.php",
                                          "name" => "LogOut",
                                          "class" => 0),
                           ),

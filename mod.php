@@ -122,6 +122,36 @@ if(($act == 'ban') && $user->group->canban && ($user->data->userid != $u->userid
 
 	header("Location: ". $set->url."/profile.php?u=$u->userid");
 	exit;
+} else if(($act == 'del') && $user->isAdmin() && ($user->data->userid != $u->userid)) {
+
+	if($_POST) { // we make sure that the users is deleted from all tables
+		$db->query("DELETE FROM `".MUS_PREFIX."users` WHERE `userid` = '$u->userid'");
+		$db->query("DELETE FROM `".MUS_PREFIX."privacy` WHERE `userid` = '$u->userid'");
+
+		$page->success = "You have deleted the user ".$options->html($u->username);
+
+	} else {
+		$show_content = "
+			<form class='well form-horizontal' action='?act=del&id=$u->userid' method='post'>
+			<fieldset>
+
+
+			<legend>Delete ".$options->html($u->username)."</legend>
+			".$options->error("You are about to DELETE ".$user->showName($u->userid).". Are you sure ?",1)."
+
+
+
+			<div class='control-group'>
+			  <label class='control-label' for='submit'></label>
+			  <div class='controls'>
+			    <button id='submit' name='submit' class='btn btn-primary'>Yes DELETE</button> <a href='$set->url/profile.php?u=$u->userid' class='btn'>Cancel</a>
+			  </div>
+			</div>
+
+			</fieldset>
+			</form>";
+	}
+
 } else {
 	header("Location: ". $set->url."/profile.php?u=$u->userid");
 	exit;

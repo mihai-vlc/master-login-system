@@ -39,19 +39,27 @@ class User {
 
 		if($this->islg()){ // set some vars
 			$this->data = $this->grabData($_SESSION['user']);
-	
-			foreach ($this->data as $k => $v) {
-				$this->filter[$k] = htmlentities($v, ENT_QUOTES);
-			}
-
-			$this->filter = (object)$this->filter; // we make it an object
-
 			
+			if($this->data) {
 
-		}else {
+				foreach ($this->data as $k => $v) {
+					$this->filter[$k] = htmlentities($v, ENT_QUOTES);
+				}
+
+				$this->filter = (object)$this->filter; // we make it an object
+			} else // in case the user was deleted
+				$this->logout();
+
+		} 
+
+
+
+		if(!$this->islg()) { // we need to call it again in case the user was deleted while logged in
+
 			// we set some default values
 			// by doing this we won't have to do an extra check to display user or `guest` on the site
 			$this->filter = new stdClass();
+			$this->data = new stdClass();
 			$this->filter->username = "Guest";
 			$this->data->userid = 0;
 			$this->data->groupid = 1;
@@ -202,5 +210,17 @@ class User {
 			return TRUE;
 		return FALSE;
 	}
+	/**
+	 * logges out the current user
+	 * @return void 
+	 */
+	function logout() {
+		global $set;
+		session_unset('user');
+		$path_info = parse_url($set->url);
+		setcookie("user", 0, time() - 3600 * 24 * 30, $path_info['path']); // delete
+		setcookie("pass", 0, time() - 3600 * 24 * 30, $path_info['path']); // delete
+	}
+
 
 }

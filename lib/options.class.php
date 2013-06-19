@@ -162,6 +162,15 @@ class Options
 
 
 	}
+	
+	/**
+	 * removes underlines and adds uppercase to words 
+	 * @param  string $text the string to be converted
+	 * @return string       converted string
+	 */
+	public function prettyPrint($text) {
+		return str_replace("_", " ", ucfirst($text));
+	}
 
 
 }

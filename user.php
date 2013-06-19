@@ -1,9 +1,10 @@
 <?php
 include "inc/init.php";
 
-if(!$user->islg())
+if(!$user->islg()){
 	header("Location: ".$set->url);
-
+	exit;
+}
 
 if(isset($_GET['id']) && $user->group->canedit && $user->exists($_GET['id'])) {
 	$uid = (int)$_GET['id'];
@@ -139,7 +140,7 @@ if(isset($_GET['password']) && ($user->data->userid == $u->userid)) {
 
 if($can_edit) {
 
-	$groups = $db->select("SELECT * FROM `".MUS_PREFIX."groups`");
+	$groups = $db->select("SELECT * FROM `".MUS_PREFIX."groups` ORDER BY `type`,`priority`");
 
 
 	// get the groups available

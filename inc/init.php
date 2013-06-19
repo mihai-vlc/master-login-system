@@ -13,7 +13,6 @@ define("MUS_ROOT", dirname(dirname(__FILE__))); // the root path
 
 
 include "settings.php";
-define("MUS_PREFIX", "");
 
 include MUS_ROOT."/lib/mysql.class.php";
 include MUS_ROOT."/lib/users.class.php";
@@ -22,10 +21,17 @@ include MUS_ROOT."/lib/options.class.php";
 
 
 
-$presets = new presets;
 $db = new dbConn($set->db_host, $set->db_user, $set->db_pass, $set->db_name);
+// we grab the settings and we merge them into $set
+$set = (object)array_merge((array)$set,(array)$db->get_row("SELECT * FROM `".MUS_PREFIX."settings` LIMIT 1"));
+
+$presets = new presets;
 $user = new User($db);
 $options = new Options;
+
+
+
+
 
 // we check for cookies to autologin
 if(!$user->islg() && isset($_COOKIE['user']) && isset($_COOKIE['pass'])) {

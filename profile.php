@@ -43,11 +43,25 @@ if(($user->data->userid == $u->userid) || ($user->group->canedit && $user->hasPr
 	$show_actions .= "<li><a href='$set->url/user.php?id=$u->userid'><i class='icon-pencil'></i> Edit profile</a></li>";
 
 
+if($user->isAdmin() && $user->data->userid != $u->userid)
+	$show_actions .="<li><a href='$set->url/mod.php?act=del&id=$u->userid'><i class='icon-trash'></i> Delete ".$options->html($u->username)."</li>";
+
+
 $tooltip = ''; // holds the tooltip data
 
 if($user->data->userid == $u->userid) {
 	$tooltip = " rel='tooltip' title='change avatar'";
 }
+
+
+// show data based on privacy
+$extra_details = '';
+
+$privacy  = $db->get_row("SELECT * FROM `".MUS_PREFIX."privacy` WHERE `userid` = '".$u->userid."'");
+
+if($privacy->email == 1 || $user->isAdmin())
+	$extra_details .= "<b>Email:</b> ". $options->html($u->email)."<br/>";
+
 
 
 echo "<div class='container'>
@@ -76,7 +90,11 @@ echo "
 			</a>
 			<div style='text-align:center;'><b>".$user->showName($u->userid)."</b></div>
 		</div>
-		<div class='span7 well' style='margin:10px;'> <b>Last seen:</b> ".$options->tsince($u->lastactive)."</div>
+		<div class='span7 well' style='margin:10px;'> 
+			<b>Last seen:</b> ".$options->tsince($u->lastactive)."<br/>
+			$extra_details
+		</div>
+
 	</div>
 </div>";
 
