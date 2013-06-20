@@ -23,7 +23,7 @@ if(!$user->islg()) // if it's not logged in we hide the user menu
 
         <link rel="stylesheet" href="<?php echo $set->url; ?>/css/bootstrap.min.css">
         <!-- join the dark side :) -->
-        <link rel="stylesheet" href="<?php echo $set->url; ?>/css/darkstrap.min.css">
+        <!-- <link rel="stylesheet" href="<?php echo $set->url; ?>/css/darkstrap.min.css">-->
         <style>
             body {
                 padding-top: 60px;

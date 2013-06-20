@@ -22,7 +22,7 @@ if($_POST) {
 	
 	$sql = "UPDATE `".MUS_PREFIX."privacy` SET ";
 	foreach ($columns as $k => $v)
-		if($k != 'userid') 
+		if(($k != 'userid') && in_array($_POST[$k], array(1,0))) // we make sure the received value is 0 or 1
 			$sql .= " `$k` = '".$db->escape($_POST[$k])."',";
 	$sql = trim($sql,",")." WHERE `userid` = '".$user->data->userid."'";
 
