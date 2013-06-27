@@ -1,6 +1,13 @@
 <?php
 
-// user profile
+/**
+ * MASTER LOGIN SYSTEM
+ * @author Mihai Ionut Vilcu (ionutvmi@gmail.com)
+ * June 2013
+ *
+ */
+
+
 
 include 'inc/init.php';
 
@@ -8,7 +15,7 @@ include 'inc/init.php';
 
 
 
-if(!isset($_GET["u"]) || !($u = $db->get_row("SELECT * FROM `".MUS_PREFIX."users` WHERE `userid`='".(int)$_GET["u"]."'"))){
+if(!isset($_GET["u"]) || !($u = $db->getRow("SELECT * FROM `".MLS_PREFIX."users` WHERE `userid`= ?i", $_GET["u"]))){
 	$page->error = "User doesn't exists or it was deleted !";
 	$u = new stdClass();
 	$u->username = 'Guest';
@@ -57,10 +64,14 @@ if($user->data->userid == $u->userid) {
 // show data based on privacy
 $extra_details = '';
 
-$privacy  = $db->get_row("SELECT * FROM `".MUS_PREFIX."privacy` WHERE `userid` = '".$u->userid."'");
+
+$privacy  = $db->getRow("SELECT * FROM `".MLS_PREFIX."privacy` WHERE `userid` = ?i", $u->userid);
+$group  = $db->getRow("SELECT * FROM `".MLS_PREFIX."groups` WHERE `groupid` = ?i", $u->groupid);
 
 if($privacy->email == 1 || $user->isAdmin())
 	$extra_details .= "<b>Email:</b> ". $options->html($u->email)."<br/>";
+
+
 
 
 
@@ -88,9 +99,10 @@ echo "
 			<a href='http://gravatar.com'$tooltip>
 				<img src='".$user->getAvatar($u->userid, 240)."' width='240' class='img-polaroid' alt='".$options->html($u->username)."'>
 			</a>
-			<div style='text-align:center;'><b>".$user->showName($u->userid)."</b></div>
+			<div style='text-align:center;'><b>".$user->showName($u->userid)." (".$options->html($u->username).") </b></div>
 		</div>
 		<div class='span7 well' style='margin:10px;'> 
+			<b>Rank:</b> ".$options->html($group->name)."<br/>
 			<b>Last seen:</b> ".$options->tsince($u->lastactive)."<br/>
 			$extra_details
 		</div>

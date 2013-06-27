@@ -172,5 +172,16 @@ class Options
 		return str_replace("_", " ", ucfirst($text));
 	}
 
+	/**
+	 * checks if the given value is a valid username
+	 * @param  string $value the value to be checked
+	 * @return bool        true if it's a match
+	 */
+	public function validUsername($value) {
+		
+		return preg_match("/^[A-Za-z][A-Za-z0-9]*(?:_[A-Za-z0-9]+)*$/", $value);
+	}
+
 
 }
+

@@ -1,4 +1,11 @@
 <?php
+/**
+ * MASTER LOGIN SYSTEM
+ * @author Mihai Ionut Vilcu (ionutvmi@gmail.com)
+ * June 2013
+ *
+ */
+
 
 
 include "inc/init.php";
@@ -29,8 +36,8 @@ if(($act == 'ban') && $user->group->canban && ($user->data->userid != $u->userid
 		$reason = $_POST['reason'];
 		if(($period > 0 && $period <= $set->max_ban_period) && isset($reason[5])) {
 			$period *= 3600*24; // convert it into seconds 
-			$db->query("UPDATE `".MUS_PREFIX."users` SET `banned` = '1' WHERE `userid` = '$u->userid'");
-			$db->query("INSERT INTO `".MUS_PREFIX."banned` SET `userid` = '$u->userid', `by` = '".$user->data->userid."', `until` = '".(time()+$period)."', `reason` = '".$db->escape($reason)."'");
+			$db->query("UPDATE `".MLS_PREFIX."users` SET `banned` = '1' WHERE `userid` = '$u->userid'");
+			$db->query("INSERT INTO `".MLS_PREFIX."banned` SET `userid` = ?i, `by` = ?i, `until` = ?i, `reason` = ?s", $u->userid, $user->data->userid, time()+$period, $reason);
 			$page->success = "User has been banned successfully for ".(int)$_POST['period']." day(s) ! ";
 		} else {
 			$page->error = "Invalid period or reason !";
@@ -108,16 +115,16 @@ if(($act == 'ban') && $user->group->canban && ($user->data->userid != $u->userid
 
 	}
 } else if(($act == 'unban') && $user->group->canban) {
-	$db->query("UPDATE `".MUS_PREFIX."users` SET `banned` = '0' WHERE `userid` = '$u->userid'");
-	$db->query("DELETE FROM `".MUS_PREFIX."banned` WHERE `userid` = '$u->userid'");
+	$db->query("UPDATE `".MLS_PREFIX."users` SET `banned` = '0' WHERE `userid` = ?i", $u->userid);
+	$db->query("DELETE FROM `".MLS_PREFIX."banned` WHERE `userid` = ?i", $u->userid);
 	header("Location: ". $set->url."/profile.php?u=$u->userid");
 	exit;
 } else if(($act == 'avt') && $user->group->canhideavt) {
 	if($u->showavt == 0){
-		if($db->query("UPDATE `".MUS_PREFIX."users` SET `showavt` = '1' WHERE `userid` = '$u->userid'"))
+		if($db->query("UPDATE `".MLS_PREFIX."users` SET `showavt` = '1' WHERE `userid` = ?i", $u->userid))
 			$_SESSION['success'] = 'Avatar showed successfully !';
 	} else
-		if($db->query("UPDATE `".MUS_PREFIX."users` SET `showavt` = '0' WHERE `userid` = '$u->userid'"))
+		if($db->query("UPDATE `".MLS_PREFIX."users` SET `showavt` = '0' WHERE `userid` = ?i", $u->userid))
 			$_SESSION['success'] = 'Avatar hidden successfully !';
 
 	header("Location: ". $set->url."/profile.php?u=$u->userid");
@@ -125,8 +132,8 @@ if(($act == 'ban') && $user->group->canban && ($user->data->userid != $u->userid
 } else if(($act == 'del') && $user->isAdmin() && ($user->data->userid != $u->userid)) {
 
 	if($_POST) { // we make sure that the users is deleted from all tables
-		$db->query("DELETE FROM `".MUS_PREFIX."users` WHERE `userid` = '$u->userid'");
-		$db->query("DELETE FROM `".MUS_PREFIX."privacy` WHERE `userid` = '$u->userid'");
+		$db->query("DELETE FROM `".MLS_PREFIX."users` WHERE `userid` = ?i", $u->userid);
+		$db->query("DELETE FROM `".MLS_PREFIX."privacy` WHERE `userid` = ?i", $u->userid);
 
 		$page->success = "You have deleted the user ".$options->html($u->username);
 

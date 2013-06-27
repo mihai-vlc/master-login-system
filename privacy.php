@@ -1,4 +1,11 @@
 <?php
+/**
+ * MASTER LOGIN SYSTEM
+ * @author Mihai Ionut Vilcu (ionutvmi@gmail.com)
+ * June 2013
+ *
+ */
+
 
 
 include "inc/init.php";
@@ -16,17 +23,18 @@ $page->title = "Privacy Settings";
 
 if($_POST) {
 
-	$data = $db->get_row("SELECT * FROM `".MUS_PREFIX."privacy` WHERE `userid` = '".$user->data->userid."'");
+	$data = $db->getRow("SELECT * FROM `".MLS_PREFIX."privacy` WHERE `userid` = ?i", $user->data->userid);
 
 	$columns = get_object_vars($data);
 	
-	$sql = "UPDATE `".MUS_PREFIX."privacy` SET ";
+	$sql = "UPDATE `".MLS_PREFIX."privacy` SET ";
 	foreach ($columns as $k => $v)
 		if(($k != 'userid') && in_array($_POST[$k], array(1,0))) // we make sure the received value is 0 or 1
-			$sql .= " `$k` = '".$db->escape($_POST[$k])."',";
-	$sql = trim($sql,",")." WHERE `userid` = '".$user->data->userid."'";
+			$sql .= $db->parse(" ?n = ?s,", $k, $_POST[$k]);
 
-	if($db->query($sql))
+	$sql = trim($sql,",").$db->parse(" WHERE `userid` = ?i", $user->data->userid);
+
+	if($db->query(" ?p",$sql))
 		$page->success = "Settings saved !";
 	else
 		$page->error = "Some error camed up ! ";
@@ -52,7 +60,7 @@ else if(isset($page->success))
   $options->success($page->success);
 
 
-$data = $db->get_row("SELECT * FROM `".MUS_PREFIX."privacy` WHERE `userid` = '".$user->data->userid."'");
+$data = $db->getRow("SELECT * FROM `".MLS_PREFIX."privacy` WHERE `userid` = ?i", $user->data->userid);
 
 $columns = get_object_vars($data);
 

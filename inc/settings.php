@@ -1,6 +1,7 @@
 <?php
 
-// Master User System v1.0
+// Master Login System
+// Mihai Ionut Vilcu (ionutvmi@gmail.com)
 // configuration file
 
 
@@ -8,6 +9,6 @@
 $set->db_host = 'localhost'; // database host
 $set->db_user = 'root'; // database user
 $set->db_pass = ''; // database password
-$set->db_name = 'mus'; // database name
+$set->db_name = 'mls'; // database name
 
-define("MUS_PREFIX", "");
+define('MLS_PREFIX', 'mls_');  

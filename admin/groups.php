@@ -1,5 +1,12 @@
 <?php
-/// admin panel index
+/**
+ * MASTER LOGIN SYSTEM
+ * @author Mihai Ionut Vilcu (ionutvmi@gmail.com)
+ * June 2013
+ * ADMIN PANEL
+ */
+
+
 
 include "../inc/init.php";
 
@@ -18,7 +25,7 @@ $groups_type = array("Guest","Member", "Moderator", "Administrator"); // all the
 
 $ignored_columns = array("groupid", "name", "type", "priority", "color");
 
-$data = $db->select("SELECT * FROM `".MUS_PREFIX."groups` ORDER BY `type`,`priority`");
+$data = $db->getAll("SELECT * FROM `".MLS_PREFIX."groups` ORDER BY `type`,`priority`");
 
 $columns = get_object_vars($data[0]); // we grab the columns name
 
@@ -32,13 +39,13 @@ if($_POST) {
 
 
       if($act == 'edit')
-        $sql = "UPDATE `".MUS_PREFIX."groups` SET ";
+        $sql = "UPDATE `".MLS_PREFIX."groups` SET ";
       else
-        $sql = "INSERT INTO `".MUS_PREFIX."groups` SET ";
+        $sql = "INSERT INTO `".MLS_PREFIX."groups` SET ";
 
       $editable = 0; // based on this we determine if it's a default group or not
 
-      if(($act == 'edit') && ($group = $db->get_row("SELECT * FROM `".MUS_PREFIX."groups` WHERE `groupid` = '".(int)$_GET['id']."'"))) 
+      if(($act == 'edit') && ($group = $db->getRow("SELECT * FROM `".MLS_PREFIX."groups` WHERE `groupid` = ?i", $_GET['id']))) 
         if($group->groupid > 4)
           $editable = 1;
       
@@ -53,40 +60,37 @@ if($_POST) {
       $priority = $_POST['priority'];
       $color = $_POST['color'];
 
-      $sql .= " `name` = '".$db->escape($name)."',";
+      $sql .= $db->parse(" `name` = ?s, `priority` = ?s, `color` = ?s, ", $name, $priority, $color);
 
       if($editable)
-        $sql .= " `type` = '".$db->escape($type)."',";
-
-      $sql .= " `priority` = '".$db->escape($priority)."',";
-      $sql .= " `color` = '".$db->escape($color)."',";
+        $sql .= $db->parse(" `type` = ?s,", $type);
 
 
 
       foreach ($_POST as $key => $value) 
         if(!in_array($key, $ignored_columns) && in_array($key, array_keys($columns))) // we make sure it's a valid key
-          $sql .= "`$key` = '".$db->escape($value)."',";
+          $sql .= $db->parse(" ?n = ?s,", $key, $value);
       
 
       if($act == 'edit')
-        $sql = trim($sql, ",")." WHERE `groupid` = '$group->groupid'";
+        $sql = trim($sql, ",").$db->parse(" WHERE `groupid` = ?i", $group->groupid);
       else
         $sql = trim($sql, ",");
 
 
-      if($db->query($sql))
+      if($db->query("?p", $sql)) // we have the query already parsed
         if($act == 'edit')
           $page->success = "Group settings successfully saved !";
         else
           $page->success = "Group successfully created !";
       else
-        $page->error = "Some error camed up !". $db->err();
+        $page->error = "Some error camed up !";
 
 
 
     } else if($act == 'del') {
 
-      if($group = $db->get_row("SELECT * FROM `".MUS_PREFIX."groups` WHERE `groupid` = '".(int)$_GET['id']."'")) {
+      if($group = $db->getRow("SELECT * FROM `".MLS_PREFIX."groups` WHERE `groupid` = ?i", $_GET['id'])) {
 
 
           $valid_groups = array();
@@ -97,8 +101,8 @@ if($_POST) {
 
 
           if(in_array($_POST['replace'], $valid_groups)) {
-              $db->query("DELETE FROM `".MUS_PREFIX."groups` WHERE `groupid` = '$group->groupid'");
-              if($db->query("UPDATE `".MUS_PREFIX."groups` SET `groupid` = '".(int)$_POST['replace']."' WHERE `groupid` = '$group->groupid'"))
+              $db->query("DELETE FROM `".MLS_PREFIX."groups` WHERE `groupid` = ?i", $group->groupid);
+              if($db->query("UPDATE `".MLS_PREFIX."groups` SET `groupid` = ?i WHERE `groupid` = ?i", $_POST['replace'], $group->groupid))
                 $page->success = "Group was successfully deleted !";
           }
 
@@ -143,7 +147,7 @@ if(($act == "add") || ($act == 'edit')) { // add and edit shows the same form so
   $edit = 0; // based on this we determine if it's edit or add
   $editable = 0; // based on this we determine if it's a default group or not
 
-  if(($act == 'edit') && ($group = $db->get_row("SELECT * FROM `".MUS_PREFIX."groups` WHERE `groupid` = '".(int)$_GET['id']."'"))) {
+  if(($act == 'edit') && ($group = $db->getRow("SELECT * FROM `".MLS_PREFIX."groups` WHERE `groupid` = ?i", $_GET['id']))) {
     $edit = 1;
     if($group->groupid > 4)
       $editable = 1;
@@ -252,7 +256,7 @@ echo "
 
 } else if($act == 'del') {
 
-  if($group = $db->get_row("SELECT * FROM `".MUS_PREFIX."groups` WHERE `groupid` = '".(int)$_GET['id']."'")) {
+  if($group = $db->getRow("SELECT * FROM `".MLS_PREFIX."groups` WHERE `groupid` = ?i", $_GET['id'])) {
 
 
   $show_groups = '';
@@ -335,3 +339,5 @@ echo "
 <?php
 include '../footer.php';
 ?>
+
+

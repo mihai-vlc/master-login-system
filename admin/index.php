@@ -1,5 +1,12 @@
 <?php
-/// admin panel index
+/**
+ * MASTER LOGIN SYSTEM
+ * @author Mihai Ionut Vilcu (ionutvmi@gmail.com)
+ * June 2013
+ * ADMIN PANEL
+ */
+
+
 
 include "../inc/init.php";
 
@@ -16,26 +23,26 @@ $presets->setActive("adminpanel");
 
 if($_POST) {
 
-  $data = $db->get_row("SELECT * FROM `".MUS_PREFIX."settings` LIMIT 1");
+  $data = $db->getRow("SELECT * FROM `".MLS_PREFIX."settings` LIMIT 1");
   $columns = get_object_vars($data);
   
-  $sql = "UPDATE `".MUS_PREFIX."settings` SET ";
+  $sql = "UPDATE `".MLS_PREFIX."settings` SET ";
   
   foreach ($columns as $k => $v)
     if($k != 'userid') 
-      $sql .= " `$k` = '".$db->escape($_POST[$k])."',";
+      $sql .= $db->parse(" ?n = ?s,", $k, $_POST[$k]);
 
   $sql = trim($sql, ",")." LIMIT 1";
 
-  if($db->query($sql))
+  if($db->query(" ?p ", $sql))
     $page->success = "Settings saved !";
   else
-    $page->error = "Some error camed up ! ". $db->err();
+    $page->error = "Some error camed up !";
 
 }
 
 // we grab the settings and we merge them into $set
-$set = (object)array_merge((array)$set,(array)$db->get_row("SELECT * FROM `".MUS_PREFIX."settings` LIMIT 1"));
+$set = (object)array_merge((array)$set,(array)$db->getRow("SELECT * FROM `".MLS_PREFIX."settings` LIMIT 1"));
 
 include "../header.php";
 
@@ -56,7 +63,7 @@ include "../header.php";
 
 
 // we make sure we get the leatest data
-$data = $db->get_row("SELECT * FROM `".MUS_PREFIX."settings` LIMIT 1");
+$data = $db->getRow("SELECT * FROM `".MLS_PREFIX."settings` LIMIT 1");
 
 $columns = get_object_vars($data);
 
@@ -85,7 +92,7 @@ foreach ($columns as $key => $value) {
   // if you don't like this approch you can always use the classic one
   // but i beleive this is more time saving in development and it will work better
 
-  if(in_array($key, array("register", "email_validation")))
+  if(in_array($key, array("register", "email_validation", "captcha"))) // add in this array columns that you want to have enabled/disabled select menu
   echo "
       <div class='control-group'>
         <label class='control-label' for='$safe_name'>".$options->prettyPrint($safe_name)."</label>

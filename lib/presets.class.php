@@ -9,7 +9,9 @@ class presets {
   
   var $active = '';
 
-
+  /**
+   * generates the items inside the top navbar
+   */
   function GenerateNavbar() {
       global $set, $user;
       $var = array();
@@ -37,7 +39,7 @@ class presets {
                                        "name" => "Donate",
                                        "class" => 0),
 
-                              1 => array("href" => "https://github.com/ionutvmi",
+                              1 => array("href" => "https://github.com/ionutvmi/master-login-system",
                                          "name" => "Fork Me On Github",
                                          "class" => 0),
                           ),

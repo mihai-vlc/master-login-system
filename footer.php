@@ -1,10 +1,20 @@
-<hr>
-
 <?php
-	if(!isset($_SESSION['token']))
-		$_SESSION['token'] = sha1(rand()); // random token
+/**
+ * MASTER LOGIN SYSTEM
+ * @author Mihai Ionut Vilcu (ionutvmi@gmail.com)
+ * June 2013
+ *
+ */
+
+
+
+
+
+    if(!isset($_SESSION['token']))
+        $_SESSION['token'] = sha1(rand()); // random token
 
 echo "
+<hr>
 
 <div class='modal hide' id='loginModal'>
     <div class='modal-header'>

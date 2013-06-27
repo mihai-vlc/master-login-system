@@ -1,5 +1,15 @@
 <?php
+/**
+ * MASTER LOGIN SYSTEM
+ * @author Mihai Ionut Vilcu (ionutvmi@gmail.com)
+ * June 2013
+ *
+ */
+
+
+
 include "inc/init.php";
+include 'lib/captcha/captcha.php';
 
 if($user->islg()) { // if it's alreadt logged in redirect to the main page 
   header("Location: $set->url");
@@ -9,12 +19,15 @@ if($user->islg()) { // if it's alreadt logged in redirect to the main page
 
 $page->title = "Register to ". $set->site_name;
 
+// determine if captcha code is correct
+$captcha = ((!$set->captcha) || ($set->captcha && isset($_SESSION['captcha']) && isset($_POST['captcha']) && ($_SESSION['captcha']['code'] === $_POST['captcha'])));
 
-if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token']) && $set->register) {
+if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token']) && $set->register && $captcha) {
 
   // we validate the data
 
   $name = $_POST['name'];
+  $display_name = $_POST['display_name'];
   $email = $_POST['email'];
   $password = $_POST['password'];
 
@@ -22,24 +35,31 @@ if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token']
   if(!isset($name[3]) || isset($name[30]))
     $page->error = "Username too short or too long !";
 
+  if(!$options->validUsername($name))
+    $page->error = "Invalid username !";
+
+  if(!isset($display_name[3]) || isset($display_name[50]))
+    $page->error = "Display name too short or too long !";
+
   if(!isset($password[3]) || isset($password[30]))
     $page->error = "Password too short or too long !";
 
   if(!$options->isValidMail($email)) 
     $page->error = "Email address is not valid.";
 
-  if($db->get_row("SELECT * FROM `".MUS_PREFIX."users` WHERE `username` = '".$db->escape($name)."'"))
+  if($db->getRow("SELECT `userid` FROM `".MLS_PREFIX."users` WHERE `username` = ?s", $name))
     $page->error = "Username already in use !";
-
-  if($db->get_row("SELECT * FROM `".MUS_PREFIX."users` WHERE `email` = '".$db->escape($email)."'"))
+  
+  if($db->getRow("SELECT `userid` FROM `".MLS_PREFIX."users` WHERE `email` = ?s", $email))
     $page->error = "Email already in use !";
 
 
   if(!isset($page->error)){
     $user_data = array(
-      "username" => $db->escape($name),
+      "username" => $name,
+      "display_name" => $display_name,
       "password" => sha1($password),
-      "email" => $db->escape($email),
+      "email" => $email,
       "lastactive" => time(),
       "regtime" => time(),
       "validated" => 1
@@ -61,17 +81,20 @@ if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token']
           $user_data["validated"] = 1;
     }
 
-    if(($id = $db->insert_array(MUS_PREFIX."users", $user_data)) && $db->query("INSERT INTO `".MUS_PREFIX."privacy` SET `userid` = '$id'")) {
+    if(($db->query("INSERT INTO `".MLS_PREFIX."users` SET ?u", $user_data)) && ($id = $db->insertId()) && $db->query("INSERT INTO `".MLS_PREFIX."privacy` SET `userid` = ?i", $id)) {
       $page->success = 1;
       $_SESSION['user'] = $id; // we automatically login the user
       $user = new User($db);
     } else
-      $page->error = $db->err();
+      $page->error = "There was an error ! Please try again !";
 
   }
 
 
 } else if($_POST)
+  if(!$captcha)
+    $page->error = "Invalid captcha code !";
+  else
     $page->error = "Invalid request !";
 
 
@@ -83,6 +106,10 @@ if(!$set->register) // we check if the registration is enabled
 
 
 $_SESSION['token'] = sha1(rand()); // random token
+
+if($set->captcha)
+  $_SESSION['captcha'] = captcha();
+
 
 $extra_content = ''; // holds success or error message
 
@@ -104,6 +131,17 @@ if(isset($page->success)) {
 } else {
 
 
+if($set->captcha)
+$captcha =  "
+  <div class='control-group'>
+    <label class='control-label' for='captcha'>Enter the code:</label>
+    <div class='controls'>
+      <img src='".$_SESSION['captcha']['image_src']."'><br/>
+      <input type='text' class='input-xlarge' name='captcha' id='captcha'>
+    </div>
+  </div>";
+else
+  $captcha = '';
 
   echo "
   <div class='container'>
@@ -123,6 +161,12 @@ if(isset($page->success)) {
             </div>
           </div>
           <div class='control-group'>
+            <label class='control-label' for='display_name'>Display name</label>
+            <div class='controls'>
+              <input type='text' class='input-xlarge' name='display_name' id='display_name'>
+            </div>
+          </div>
+          <div class='control-group'>
             <label class='control-label' for='email'>Email Address</label>
             <div class='controls'>
               <input type='text' class='input-xlarge' name='email' id='email'>
@@ -135,6 +179,7 @@ if(isset($page->success)) {
             </div>
           </div>
           <input type='hidden' name='token' value='".$_SESSION['token']."'>
+          $captcha
           <div class='form-actions'>
           <button type='submit' class='btn btn-primary btn-large'>Register</button>
             <button type='reset' class='btn'>Reset</button>
@@ -152,3 +197,4 @@ if(isset($page->success)) {
 
 
 include "footer.php";
+

@@ -1,4 +1,12 @@
 <?php
+/**
+ * MASTER LOGIN SYSTEM
+ * @author Mihai Ionut Vilcu (ionutvmi@gmail.com)
+ * June 2013
+ *
+ */
+
+
 include "inc/init.php";
 
 if($user->islg()) { // if it's alreadt logged in redirect to the main page 
@@ -19,14 +27,14 @@ if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token']
         if(!$options->isValidMail($email)) 
             $page->error = "Email address is not valid.";   
         
-        if(!isset($page->error) && !($usr = $db->get_row("SELECT `userid` FROM `".MUS_PREFIX."users` WHERE `email` = '".$db->escape($email)."'")))
+        if(!isset($page->error) && !($usr = $db->getRow("SELECT `userid` FROM `".MLS_PREFIX."users` WHERE `email` = ?s", $email)))
             $page->error = "This email address doesn't exist in our database !";
 
 
         if(!isset($page->error)) {
             $key = sha1(rand());
            
-            $db->query("UPDATE `".MUS_PREFIX."users` SET `key` = '$key' WHERE `userid` = '$usr->userid'");
+            $db->query("UPDATE `".MLS_PREFIX."users` SET `key` = ?s WHERE `userid` = ?i", $key, $usr->userid);
            
             $link = $set->url."/login.php?key=".$key."&userid=".$usr->userid;
 
@@ -42,9 +50,9 @@ if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token']
             header("Location: $set->url");
             exit;
         }
-        if($usr = $db->get_row("SELECT `userid` FROM `".MUS_PREFIX."users` WHERE `key` = '".$db->escape($_GET['key'])."'")) {
-            if($db->query("UPDATE `".MUS_PREFIX."users` SET `password` = '".sha1($_POST['password'])."' WHERE `userid` = '$usr->userid'")) {
-                $db->query("UPDATE `".MUS_PREFIX."users` SET `key` = '0' WHERE `userid` = '$usr->userid'");
+        if($usr = $db->getRow("SELECT `userid` FROM `".MLS_PREFIX."users` WHERE `key` = ?s", $_GET['key'])) {
+            if($db->query("UPDATE `".MLS_PREFIX."users` SET `password` = ?s WHERE `userid` = ?i", sha1($_POST['password']), $usr->userid)) {
+                $db->query("UPDATE `".MLS_PREFIX."users` SET `key` = '0' WHERE `userid` = ?i", $usr->userid);
                 $page->success = "Password was updated !";
             }
 
@@ -55,7 +63,7 @@ if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token']
         $password = $_POST['password'];
 
 
-        if(!($usr = $db->get_row("SELECT `userid` FROM `".MUS_PREFIX."users` WHERE `username` = '".$db->escape($name)."' AND `password` = '".sha1($password)."'")))
+        if(!($usr = $db->getRow("SELECT `userid` FROM `".MLS_PREFIX."users` WHERE `username` = ?s AND `password` = ?s", $name, sha1($password))))
             $page->error = "Username or password are wrong !";
         else {
             if($_POST['r'] == 1){
@@ -117,7 +125,7 @@ if(isset($_GET['forget'])) {
         echo "<div class=\"alert alert-error\">Error !</div>";
         exit;
     }
-    if($usr = $db->get_row("SELECT `userid` FROM `".MUS_PREFIX."users` WHERE `key` = '".$db->escape($_GET['key'])."' AND `userid` = '".(int)$_GET['userid']."'")) {
+    if($usr = $db->getRow("SELECT `userid` FROM `".MLS_PREFIX."users` WHERE `key` = ?s AND `userid` = ?i", $_GET['key'], $_GET['userid'])) {
     echo "<form class='form-horizontal well' action='#' method='post'>
         <fieldset>
             <legend>Reset</legend>

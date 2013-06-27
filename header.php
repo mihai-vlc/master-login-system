@@ -1,4 +1,12 @@
 <?php
+/**
+ * MASTER LOGIN SYSTEM
+ * @author Mihai Ionut Vilcu (ionutvmi@gmail.com)
+ * June 2013
+ *
+ */
+
+
 // we generate the navbar components in case they weren't before
 if($page->navbar == array())
     $page->navbar = $presets->GenerateNavbar();
@@ -7,9 +15,7 @@ if(!$user->islg()) // if it's not logged in we hide the user menu
     unset($page->navbar[count($page->navbar)-1]);
 
 
-?>
-
-<!DOCTYPE html>
+?><!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
@@ -87,10 +93,11 @@ foreach ($page->navbar as $key => $v) {
     
 }
 
+echo "</ul>";
 
 if(!$user->islg()) { 
 
-echo "</ul><span class='pull-right'>
+echo "<span class='pull-right'>
         <a href='$set->url/register.php' class='btn btn-primary btn-small'>Sign Up</a>
         <!-- <a href='$set->url/login.php' class='btn btn-small'>Login</a> -->
         <a href='#loginModal' data-toggle='modal' class='btn btn-small'>Login</a>
@@ -111,11 +118,11 @@ echo "
 if($user->data->banned) {
   
     // we delete the expired banned
-    $_unban = $db->select("SELECT `userid` FROM `".MUS_PREFIX."banned` WHERE `until` < ".time());
+    $_unban = $db->getAll("SELECT `userid` FROM `".MLS_PREFIX."banned` WHERE `until` < ".time());
     if($_unban) 
         foreach ($_unban as $_usr) {
-            $db->query("DELETE FROM `".MUS_PREFIX."banned` WHERE `userid` = '$_usr->userid'");
-            $db->query("UPDATE `".MUS_PREFIX."users` SET `banned` = '0' WHERE `userid` = '$_usr->userid'");             
+            $db->query("DELETE FROM `".MLS_PREFIX."banned` WHERE `userid` = ?i", $_usr->userid);
+            $db->query("UPDATE `".MLS_PREFIX."users` SET `banned` = '0' WHERE `userid` = ?i", $_usr->userid);             
         }
 
 
@@ -135,6 +142,10 @@ if($user->data->banned) {
 
 if($user->islg() && $set->email_validation && ($user->data->validated != 1)) {
     $options->fError("Your account is not yet acctivated ! Please check your email !");
+}
+
+if(file_exists('install.php')) {
+    $options->fError("You have to delete the install.php file before you start using this app.");
 }
 
 

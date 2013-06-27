@@ -92,7 +92,7 @@ class User {
 			else
 				return "$set->url/img/default-avatar.png";
 		}
-		$u = $this->db->get_row("SELECT `email`, `showavt` FROM `".MUS_PREFIX."users` WHERE `userid` = '".(int)$userid."'");
+		$u = $this->db->getRow("SELECT `email`, `showavt` FROM `".MLS_PREFIX."users` WHERE `userid` = ?i", $userid);
 		if($u->showavt)	
 			return "http://www.gravatar.com/avatar/".md5($u->email).$size;
 		else	
@@ -108,10 +108,10 @@ class User {
 	function getGroup($userid = 0) {
 
 		if(!$userid)
-			return $this->db->get_row("SELECT * FROM `".MUS_PREFIX."groups` WHERE `groupid` = '".$this->data->groupid."'");
+			return $this->db->getRow("SELECT * FROM `".MLS_PREFIX."groups` WHERE `groupid` = ?i", $this->data->groupid);
 
-		$u = $this->db->get_row("SELECT `groupid` FROM `".MUS_PREFIX."users` WHERE `userid` = '".(int)$userid."'");
-		return $this->db->get_row("SELECT * FROM `".MUS_PREFIX."groups` WHERE `groupid` = '".$u->groupid."'");
+		$u = $this->db->getRow("SELECT `groupid` FROM `".MLS_PREFIX."users` WHERE `userid` = ?i", $userid);
+		return $this->db->getRow("SELECT * FROM `".MLS_PREFIX."groups` WHERE `groupid` = ?i", $u->groupid);
 	}
 	/**
 	 * get the ban details about the user
@@ -122,7 +122,7 @@ class User {
 
 		if(!$userid)
 			$userid = $this->data->userid;
-		return $this->db->get_row("SELECT * FROM `".MUS_PREFIX."banned` WHERE `userid` = '".(int)$userid."'");
+		return $this->db->getRow("SELECT * FROM `".MLS_PREFIX."banned` WHERE `userid` = ?i", $userid);
 	}
 
 	/**
@@ -134,17 +134,17 @@ class User {
 
 		if(!$userid)
 			if($this->data->banned)
-				return "<strike>".$this->filter->username."</strike>";
+				return "<strike>".$this->filter->display_name."</strike>";
 			else	
-				return "<font color='".$this->group->color."'>".$this->filter->username."</font>";
+				return "<font color='".$this->group->color."'>".$this->filter->display_username."</font>";
 
-		$u = $this->db->get_row("SELECT `username`,`banned` FROM `".MUS_PREFIX."users` WHERE `userid` = '".(int)$userid."'");
+		$u = $this->db->getRow("SELECT `display_name`,`banned` FROM `".MLS_PREFIX."users` WHERE `userid` = ?i", $userid);
 		$group = $this->getGroup($userid);
 	
 		if($u->banned)
-			return "<strike>".htmlentities($u->username, ENT_QUOTES)."</strike>";		
+			return "<strike>".htmlentities($u->display_name, ENT_QUOTES)."</strike>";		
 		else	
-			return "<font color='".$group->color."'>".htmlentities($u->username, ENT_QUOTES)."</font>";		
+			return "<font color='".$group->color."'>".htmlentities($u->display_name, ENT_QUOTES)."</font>";		
 	}
 
 
@@ -180,7 +180,7 @@ class User {
 	 * @return boolean          true if exists
 	 */
 	function exists($userid) {
-		if($this->db->get_row("SELECT `userid` FROM `".MUS_PREFIX."users` WHERE `userid` = '".(int)$userid."'"))
+		if($this->db->getRow("SELECT `userid` FROM `".MLS_PREFIX."users` WHERE `userid` = ?i", $userid))
 			return TRUE;
 		return FALSE;
 	}
@@ -190,7 +190,7 @@ class User {
 	 * @return object         data about the specified id
 	 */
 	function grabData($userid) {
-		return $this->db->get_row("SELECT * FROM `".MUS_PREFIX."users` WHERE `userid` = '".(int)$userid."'");
+		return $this->db->getRow("SELECT * FROM `".MLS_PREFIX."users` WHERE `userid` = ?i", $userid);
 	}
 	/**
 	 * Checks if a user is admin
@@ -204,7 +204,7 @@ class User {
 			else
 				return FALSE;
 
-		$u = $this->db->get_row("SELECT `username`,`banned` FROM `".MUS_PREFIX."users` WHERE `userid` = '".(int)$userid."'");
+		$u = $this->db->getRow("SELECT `username`,`banned` FROM `".MLS_PREFIX."users` WHERE `userid` = ?i", $userid);
 		$group = $this->getGroup($userid);
 		if($group->type >= 3)
 			return TRUE;
@@ -224,3 +224,6 @@ class User {
 
 
 }
+
+
+

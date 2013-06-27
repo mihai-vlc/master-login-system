@@ -1,4 +1,11 @@
 <?php
+/**
+ * MASTER LOGIN SYSTEM
+ * @author Mihai Ionut Vilcu (ionutvmi@gmail.com)
+ * June 2013
+ *
+ */
+
 
 include "inc/init.php";
 include 'lib/pagination.class.php';
@@ -48,10 +55,10 @@ foreach ($sort_name as $k => $v) {
 $where = '';
 
 if(isset($_GET['q'])) 
-  $where = "WHERE `username` LIKE '%".$db->escape($_GET['q'])."%'";
+  $where = $db->parse("WHERE `username` LIKE ?s", '%'.$_GET['q'].'%');
 
 
-if($total_results = $db->count("SELECT * FROM `".MUS_PREFIX."users` $where")) {
+if($total_results = $db->getRow("SELECT COUNT(*) as count FROM `".MLS_PREFIX."users` ?p", $where)->count) {
 
     // pagination
     if(!isset($page_number))
@@ -66,7 +73,7 @@ if($total_results = $db->count("SELECT * FROM `".MUS_PREFIX."users` $where")) {
 
     $start = ($page_number - 1) * $perpage;
 
-    $data = $db->select("SELECT * FROM `".MUS_PREFIX."users` $where ORDER BY $order_by LIMIT $start,$perpage");
+    $data = $db->getAll("SELECT * FROM `".MLS_PREFIX."users` ?p ORDER BY ?p LIMIT ?i,?i", $where, $order_by, $start, $perpage);
 
 
     $pagination = new pagination($total_results, $page_number, $perpage);

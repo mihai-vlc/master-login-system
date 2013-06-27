@@ -1,24 +1,28 @@
-master-login-system
-===================
-
-A simple login system build upon bootstrap (still in development)
-
-
-== Install == 
-
-1. Upload the files to your server
-
-2. Load the sql data from the sql file
-
-3. Edit with your database details in /inc/settings.php
+Master Login System  
+===================  
+  
+An advanced login system build upon bootstrap with features like  
+- password recovery  
+- privacy settings  
+- admin panel  
+- user profile  
+- groups system (member, moderator, administrator and your custom one)  
+- contact form  
+- member list  
 
 
-== ScreenShoots ==
 
-http://puu.sh/3gtZd.png - users list
 
-http://puu.sh/34xRK.png - login form
+== Install ==  
 
-http://puu.sh/34ytf.png - index page
+1. Upload the files to your server  
+2. Run /install.php in your browser and complete the form  
+3. Edit with your database details in /inc/settings.php  
 
-http://puu.sh/34yuS.png - register form
+
+== ScreenShoots ==  
+
+http://puu.sh/3gtZd.png - users list  
+http://puu.sh/34xRK.png - login form  
+http://puu.sh/34ytf.png - index page  
+http://puu.sh/34yuS.png - register form  
