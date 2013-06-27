@@ -84,7 +84,7 @@ EEE;
   $sqls[] = "
   INSERT INTO `".$prefix."groups` (`groupid`, `name`, `type`, `priority`, `color`, `canban`, `canhideavt`, `canedit`) VALUES
 (1, 'Guest', 0, 1, '', 0, 0, 0),
-(2, 'Member', 1, 1, '#08c', 1, 0, 0),
+(2, 'Member', 1, 1, '#08c', 0, 0, 0),
 (3, 'Moderator', 2, 1, 'green', 1, 1, 0),
 (4, 'Administrator', 3, 1, '#F0A02D', 1, 1, 1);";
 
