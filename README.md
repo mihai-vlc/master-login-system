@@ -17,7 +17,7 @@ An advanced login system build upon bootstrap with features like
 
 1. Upload the files to your server  
 2. Run /install.php in your browser and complete the form  
-3. Edit with your database details in /inc/settings.php  
+3. Done !!
 
 
 == ScreenShoots ==  
