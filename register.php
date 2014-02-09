@@ -11,7 +11,7 @@
 include "inc/init.php";
 include 'lib/captcha/captcha.php';
 
-if($user->islg()) { // if it's alreadt logged in redirect to the main page 
+if($user->islg()) { // if it's alreadt logged in redirect to the main page
   header("Location: $set->url");
   exit;
 }
@@ -44,12 +44,12 @@ if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token']
   if(!isset($password[3]) || isset($password[30]))
     $page->error = "Password too short or too long !";
 
-  if(!$options->isValidMail($email)) 
+  if(!$options->isValidMail($email))
     $page->error = "Email address is not valid.";
 
   if($db->getRow("SELECT `userid` FROM `".MLS_PREFIX."users` WHERE `username` = ?s", $name))
     $page->error = "Username already in use !";
-  
+
   if($db->getRow("SELECT `userid` FROM `".MLS_PREFIX."users` WHERE `email` = ?s", $email))
     $page->error = "Email already in use !";
 
@@ -70,10 +70,10 @@ if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token']
       $user_data["validated"] = $key = sha1(rand());
 
       $link = $set->url."/validate.php?key=".$key."&username=".urlencode($name);
-      
-      
 
-      $from ="From: not.reply@".$set->url;
+
+      $url_info = parse_url($set->url);
+      $from ="From: not.reply@".$url_info['host'];
       $sub = "Activate your account !";
       $msg = "Hello ".$options->html($name).",<br> Thank you for choosing to be a member of out community.<br/><br/> To confirm your account <a href='$link'>click here</a>.<br>If you can't access copy this to your browser<br/>$link  <br><br>Regards<br><small>Note: Dont reply to this email. If you got this email by mistake then ignore this email.</small>";
       if(!$options->sendMail($email, $sub, $msg, $from))
@@ -117,7 +117,7 @@ if(isset($page->error))
   $extra_content = $options->error($page->error);
 
 if(isset($page->success)) {
-  
+
   echo "<div class='container'>
     <div class='span3 hidden-phone'></div>
     <div class='span6 well'>
