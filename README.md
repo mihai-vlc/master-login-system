@@ -17,7 +17,8 @@ http://www.youtube.com/watch?v=y7SdQfZfLbA
 == Install ==  
 
 1. Upload the files to your server  
-2. Run /install.php in your browser and complete the form  
+2. Run /install.php in your browser and complete the form. 
+After running the install.php script please check that the `inc/settings.php` contains the correct database connection details.
 3. Done !!
 
 
