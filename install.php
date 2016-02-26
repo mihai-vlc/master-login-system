@@ -117,7 +117,7 @@ EEE;
   `userid` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(50) NOT NULL,
   `display_name` varchar(255) NOT NULL,
-  `password` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `key` varchar(50) NOT NULL,
   `validated` varchar(100) NOT NULL,
@@ -131,7 +131,7 @@ EEE;
 
   $sqls[] = "
   INSERT INTO `".$prefix."users` (`userid`, `username`, `display_name`, `password`, `email`, `key`, `validated`, `groupid`, `lastactive`, `showavt`, `banned`, `regtime`) VALUES
-(1, 'admin', 'Admin', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220', 'admin@gmail.com', '', '1', 4, ".time().", 1, 0, ".time().");";
+(1, 'admin', 'Admin', '$2y$10\$PGWUi93Gf1D/Z851bMJxDOrLYvXj.r2MFWCNATT1TeJ29S8hfHp4i', 'admin@gmail.com', '', '1', 4, ".time().", 1, 0, ".time().");";
 
 
 
