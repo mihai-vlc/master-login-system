@@ -8,11 +8,15 @@
 
 
 include "inc/init.php";
+include 'lib/captcha/captcha.php';
 
 if($user->islg()) { // if it's alreadt logged in redirect to the main page 
   header("Location: $set->url");
   exit;
 }
+
+// determine if captcha code is correct
+$captcha = ((!$set->captcha) || ($set->captcha && isset($_SESSION['captcha']) && isset($_POST['captcha']) && ($_SESSION['captcha']['code'] === $_POST['captcha'])));
 
 
 $page->title = "Login to ". $set->site_name;
@@ -51,20 +55,26 @@ if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token']
             exit;
         }
         if($usr = $db->getRow("SELECT `userid` FROM `".MLS_PREFIX."users` WHERE `key` = ?s", $_GET['key'])) {
-            if($db->query("UPDATE `".MLS_PREFIX."users` SET `password` = ?s WHERE `userid` = ?i", sha1($_POST['password']), $usr->userid)) {
+            if($db->query("UPDATE `".MLS_PREFIX."users` SET `password` = ?s WHERE `userid` = ?i", password_hash($_POST['password']), $usr->userid)) {
                 $db->query("UPDATE `".MLS_PREFIX."users` SET `key` = '0' WHERE `userid` = ?i", $usr->userid);
                 $page->success = "Password was updated !";
             }
 
         }
 
-    } else {
+    } 
+	else {
         $name = $_POST['name'];
         $password = $_POST['password'];
 
+		$hashedpw= $db->getRow("SELECT `password` FROM `".MLS_PREFIX."users` WHERE `username` = ?s", $_POST['name']);
 
-        if(!($usr = $db->getRow("SELECT `userid` FROM `".MLS_PREFIX."users` WHERE `username` = ?s AND `password` = ?s", $name, sha1($password))))
-            $page->error = "Username or password are wrong !";
+        if(!($usr = $db->getRow("SELECT `userid` FROM `".MLS_PREFIX."users` WHERE `username` = ?s", $_POST['name'])) || !(password_verify($password, ($hashedpw->password)))){            
+			$page->error = "Username or password are wrong !";
+		}
+		else if($_POST)
+			if(!$captcha)
+				$page->error = "Invalid captcha code !";
         else {
             if($_POST['r'] == 1){
                 $path_info = parse_url($set->url);
@@ -89,12 +99,26 @@ $_SESSION['token'] = sha1(rand()); // random token
   <div class='row'>
     <div class='span3 hidden-phone'></div>
       <div class='span6' id='form-login'>";
+if($set->captcha)
+  $_SESSION['captcha'] = captcha();
 
 
 if(isset($page->error))
   $options->error($page->error);
 else if(isset($page->success))
   $options->success($page->success);
+
+if($set->captcha)
+$captcha =  "
+  <div class='control-group'>
+    <label class='control-label' for='captcha'>Enter the code:</label>
+    <div class='controls'>
+      <img src='".$_SESSION['captcha']['image_src']."'><br/>
+      <input type='text' class='input-xlarge' name='captcha' id='captcha'>
+    </div>
+  </div>";
+else
+  $captcha = '';
 
 
 if(isset($_GET['forget'])) {
@@ -188,6 +212,8 @@ if(isset($_GET['forget'])) {
             </div>
 
             <input type='hidden' name='token' value='".$_SESSION['token']."'>
+				$captcha
+			<div class='form-actions'>
 
             <div class='control-group'>
               <div class='controls'>
