@@ -70,7 +70,7 @@ if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token']
 		$hashedpw= $db->getRow("SELECT `password` FROM `".MLS_PREFIX."users` WHERE `username` = ?s", $_POST['name']);
 
         if(!($usr = $db->getRow("SELECT `userid` FROM `".MLS_PREFIX."users` WHERE `username` = ?s", $_POST['name'])) || !(password_verify($password, ($hashedpw->password)))){            
-			$page->error = "Username or password are wrong !";
+		$page->error = "Username or password are wrong !";
 		}
 		else if($_POST)
 			if(!$captcha)
@@ -212,16 +212,16 @@ if(isset($_GET['forget'])) {
             </div>
 
             <input type='hidden' name='token' value='".$_SESSION['token']."'>
-				$captcha
-			<div class='form-actions'>
-
+			$captcha
+		<div class='form-actions'>
+		</div>
             <div class='control-group'>
               <div class='controls'>
-
+			
               <button type='submit' id='submit' class='btn btn-primary'>Sign in</button>
 
               <a href='?forget=1' class='btn btn-secondary'>Forgot Password</a>
-
+			
               </div>
             </div>
           </fieldset>";
