@@ -62,15 +62,14 @@ if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token']
 
         }
 
-    } 
-	else {
+    } else {
         $name = $_POST['name'];
         $password = $_POST['password'];
 
 		$hashedpw= $db->getRow("SELECT `password` FROM `".MLS_PREFIX."users` WHERE `username` = ?s", $_POST['name']);
 
         if(!($usr = $db->getRow("SELECT `userid` FROM `".MLS_PREFIX."users` WHERE `username` = ?s", $_POST['name'])) || !(password_verify($password, ($hashedpw->password)))){            
-		$page->error = "Username or password are wrong !";
+	    $page->error = "Username or password are wrong !";
 		}
 		else if($_POST)
 			if(!$captcha)
