@@ -45,6 +45,10 @@ if($_POST) {
 
       $editable = 0; // based on this we determine if it's a default group or not
 
+      if ($act == 'add') {
+        $editable = 1;
+      }
+
       if(($act == 'edit') && ($group = $db->getRow("SELECT * FROM `".MLS_PREFIX."groups` WHERE `groupid` = ?i", $_GET['id']))) 
         if($group->groupid > 4)
           $editable = 1;
