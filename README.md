@@ -2,19 +2,19 @@ Master Login System
 ===================  
   
 An advanced login system build upon bootstrap with features like  
-- password recovery  
-- privacy settings  
-- admin panel  
-- user profile  
-- groups system (member, moderator, administrator and your custom one)  
-- contact form  
-- member list  
+- Password recovery  
+- Privacy settings  
+- Admin panel  
+- User profile  
+- Groups system (member, moderator, administrator and your custom one)  
+- Contact form  
+- Member list  
 
 Video Walkthrough  
 http://www.youtube.com/watch?v=y7SdQfZfLbA
 
 
-== Install ==  
+##== Installation ==  
 
 1. Upload the files to your server  
 2. Run /install.php in your browser and complete the form. 
@@ -22,12 +22,14 @@ After running the install.php script please check that the `inc/settings.php` co
 3. Done !!
 
 
-== ScreenShoots ==  
+##== ScreenShoots ==  
 
-http://puu.sh/3gtZd.png - users list  
-http://puu.sh/34xRK.png - login form  
-http://puu.sh/34ytf.png - index page  
-http://puu.sh/34yuS.png - register form  
+<p align="center">
+  <img src="http://puu.sh/3gtZd.png"/>
+  <img src="http://puu.sh/34xRK.png"/>
+  <img src="http://puu.sh/34ytf.png"/>
+  <img src="http://puu.sh/34yuS.png"/>
+</p>
 
 Donate 
 -----------------
