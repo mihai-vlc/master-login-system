@@ -1,6 +1,8 @@
 Master Login System  
 ===================  
-  
+
+### Note: This project is no longer mentained.  
+
 An advanced login system build upon bootstrap with features like  
 - Password recovery  
 - Privacy settings  
