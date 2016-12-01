@@ -58,7 +58,7 @@ if($_POST && isset($_SESSION['token']) && ($_SESSION['token'] == $_POST['token']
     $user_data = array(
       "username" => $name,
       "display_name" => $display_name,
-      "password" => sha1($password),
+      "password" => password_hash($password,PASSWORD_DEFAULT),
       "email" => $email,
       "lastactive" => time(),
       "regtime" => time(),
@@ -191,8 +191,6 @@ else
 
   </div>";
 }
-
-
 
 
 
