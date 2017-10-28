@@ -1,16 +1,16 @@
 Master Login System  
 ===================  
 
-### Note: This project is no longer mentained.  
+### Note: This project is no longer maintained.  
 
-An advanced login system build upon bootstrap with features like  
+An advanced login system build upon bootstrap with features like:
 - Password recovery  
 - Privacy settings  
 - Admin panel  
 - User profile  
-- Groups system (member, moderator, administrator and your custom one)  
+- Groups system (member, moderator, administrator, plus custom groups)  
 - Contact form  
-- Member list  
+- Members list  
 
 Video Walkthrough  
 http://www.youtube.com/watch?v=y7SdQfZfLbA
