@@ -1,7 +1,7 @@
+# NOTE: THIS PROJECT HAS NOW MOVED TO [MASTER-LOGIN-SYSTEM](https://github.com/VinylCarbon/master-login-system).  
+
 Master Login System  
 ===================  
-
-### Note: This project is no longer maintained.  
 
 An advanced login system build upon bootstrap with features like:
 - Password recovery  
